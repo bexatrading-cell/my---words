@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер слов</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 20px; }
+        .card { background: #f8f9fa; margin-bottom: 15px; padding: 15px; border-radius: 12px; border-left: 4px solid #4a90e2; }
+        .word-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .word-row strong { min-width: 90px; color: #2c3e50; }
+        .hidden-translate { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #000000 !important; }
+        .hidden-translate:hover { filter: blur(2px); }
+        .hidden-translate.revealed { filter: blur(0); cursor: default; }
+        .lang-tags { display: flex; gap: 10px; font-size: 14px; }
+        .lang-tags span { padding: 2px 8px; border-radius: 4px; color: white; font-weight: bold; }
+        .ru-bg { background: #e74c3c; }
+        .tj-bg { background: #f39c12; }
+        .en-bg { background: #3498db; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        .btn { background: #4a90e2; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn:hover { background: #357abd; }
+        .btn-outline { background: transparent; border: 2px solid #4a90e2; color: #4a90e2; }
+        .add-form { margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee; }
+        .add-form h3 { margin-top: 0; }
+        .form-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .form-group input { flex: 1; min-width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 8px; }
+        .form-group button { padding: 8px 15px; border: none; background: #27ae60; color: white; border-radius: 8px; cursor: pointer; }
+        .footer-note { text-align: center; font-size: 13px; color: #7f8c8d; margin-top: 20px; }
+        @media (max-width: 480px) { .word-row { flex-direction: column; align-items: flex-start; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Тренажёр слов</h1>
+        <div class="btn-group">
+            <button class="btn" id="revealAllBtn">Показать все переводы</button>
+            <button class="btn btn-outline" id="hideAllBtn">Скрыть все переводы</button>
+        </div>
+        <div id="wordList">
+        </div>
+        <div class="add-form">
+            <h3>➕ Добавить своё слово</h3>
+            <div class="form-group">
+                <input type="text" id="inputEn" placeholder="Английский">
+                <input type="text" id="inputRu" placeholder="Русский">
+                <input type="text" id="inputTj" placeholder="Таджикский">
+                <button id="addBtn">Добавить</button>
+            </div>
+            <p style="font-size:13px; color:#888; margin-top:10px;">Слова сохраняются в браузере.</p>
+        </div>
+        <div class="footer-note">Нажми на размытый перевод, чтобы увидеть его</div>
+    </div>
+    <script>
+        // База слов по умолчанию
+        let words = [
+            { en: "Hello", ru: "Привет", tj: "Салом" },
+            { en: "Thank you", ru: "Спасибо", tj: "Ташаккур" },
+            { en: "Please", ru: "Пожалуйста", tj: "Лутфан" },
+            { en: "Goodbye", ru: "До свидания", tj: "Хайр" },
+            { en: "How are you?", ru: "Как дела?", tj: "Чӣ хел?" }
+        ];
+
+        // Загрузка сохраненных слов из localStorage
+        if (localStorage.getItem('savedWords')) {
+            words = JSON.parse(localStorage.getItem('savedWords'));
+        }
+
+        function renderWords() {
+            const list = document.getElementById('wordList');
+            list.innerHTML = '';
+            words.forEach((word, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="word-row">
+                        <strong>${word.en}</strong>
+                        <div class="lang-tags">
+                            <span class="ru-bg">🇷🇺</span>
+                            <span class="hidden-translate" data-index="${index}" data-lang="ru">${word.ru}</span>
+                        </div>
+                        <div class="lang-tags">
+                            <span class="tj-bg">🇹🇯</span>
+                            <span class="hidden-translate" data-index="${index}" data-lang="tj">${word.tj}</span>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            // Добавляем клик на размытые переводы
+            document.querySelectorAll('.hidden-translate').forEach(el => {
+                el.addEventListener('click', function() {
+                    this.classList.toggle('revealed');
+                });
+            });
+        }
+
+        function saveWords() {
+            localStorage.setItem('savedWords', JSON.stringify(words));
+        }
+
+        // Кнопка "Показать все"
+        document.getElementById('revealAllBtn').addEventListener('click', () => {
+            document.querySelectorAll('.hidden-translate').forEach(el => el.classList.add('revealed'));
+        });
+
+        // Кнопка "Скрыть все"
+        document.getElementById('hideAllBtn').addEventListener('click', () => {
+            document.querySelectorAll('.hidden-translate').forEach(el => el.classList.remove('revealed'));
+        });
+
+        // Добавление слова
+        document.getElementById('addBtn').addEventListener('click', () => {
+            const en = document.getElementById('inputEn').value.trim();
+            const ru = document.getElementById('inputRu').value.trim();
+            const tj = document.getElementById('inputTj').value.trim();
+            if (en && ru && tj) {
+                words.push({ en, ru, tj });
+                saveWords();
+                renderWords();
+                document.getElementById('inputEn').value = '';
+                document.getElementById('inputRu').value = '';
+                document.getElementById('inputTj').value = '';
+            } else {
+                alert('Заполни все три поля!');
+            }
+        });
+
+        renderWords();
+    </script>
+</body>
+</html>
