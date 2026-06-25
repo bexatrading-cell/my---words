@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профессори Травматология</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #e9edf2; display: flex; justify-content: center; padding: 40px; margin: 0; }
+        .container { max-width: 900px; width: 100%; background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #1a3c5e; font-size: 28px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .sub-title { text-align: center; color: #777; font-size: 14px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+
+        .chat-area { display: flex; flex-direction: column; gap: 15px; background: #f8f9fa; border-radius: 16px; padding: 20px; height: 500px; border: 1px solid #ddd; }
+        .chat-history { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 10px; }
+        .chat-msg { padding: 10px 15px; border-radius: 16px; max-width: 85%; line-height: 1.4; }
+        .chat-bot { background: #dce6f5; align-self: flex-start; color: #1a3c5e; }
+        .chat-user { background: #dcedc8; align-self: flex-end; color: #1b5e20; }
+        .chat-input-area { display: flex; gap: 10px; align-items: center; margin-top: 5px; }
+        .chat-input { flex-grow: 1; padding: 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; font-size: 15px; }
+        .chat-input:focus { border-color: #2a6b9e; }
+        .btn-send { background: #2a6b9e; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .btn-mic { background: #ff9800; color: white; border: none; padding: 12px; border-radius: 50%; cursor: pointer; font-size: 18px; width: 48px; height: 48px; }
+        .btn-mic.listening { background: #f44336; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        .api-key-area { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+        .api-key-input { flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; }
+        .api-key-btn { background: #2c3e50; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+
+        @media (max-width: 500px) { .container { padding: 15px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🩻 Профессори Травматология</h1>
+    <div class="sub-title">Бот аз рӯи дониши тиббӣ ба шумо савол медиҳад ва ҷавобатонро арзёбӣ мекунад. Барои кор кардан OpenAI API Key лозим аст.</div>
+    
+    <div class="api-key-area">
+        <input type="password" class="api-key-input" id="apiKeyInput" placeholder="API Key OpenAI -ро ин ҷо гузоред">
+        <button class="api-key-btn" onclick="saveApiKey()">OK</button>
+    </div>
+
+    <div class="chat-area">
+        <div class="chat-history" id="chatHistory">
+            <div class="chat-msg chat-bot">👋 Ассалому алайкум, студент! Ман профессори травматология ҳастам. Биёед дониши худро дар бораи устухонҳо, дардҳо ва ҷарроҳӣ санҷем. Барои оғоз ба ман бигӯед: <b>"Начнём"</b></div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ба профессор ҷавоб диҳед...">
+            <button class="btn-mic" id="voiceBtn">🎤</button>
+            <button class="btn-send" id="sendBtn">Фиристодан</button>
+        </div>
+    </div>
+    <div class="sub-title" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
+        🎤 барои микрофон. Бо овози ИИ ҷавоб мегӯяд.
+    </div>
+</div>
+
+<script>
+    let apiKey = localStorage.getItem('prof_api_key') || '';
+
+    function saveApiKey() {
+        const input = document.getElementById('apiKeyInput').value.trim();
+        if(input) {
+            apiKey = input;
+            localStorage.setItem('prof_api_key', apiKey);
+            addBotMessage("✅ API Key сабт шуд. Акнун профессор метавонад савол диҳад!");
+        } else {
+            alert("Лутфан калиди OpenAI -ро гузоред!");
+        }
+    }
+    if(apiKey) document.getElementById('apiKeyInput').value = apiKey;
+
+    const chatHistory = document.getElementById('chatHistory');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // Системаи профессор
+    let chatMessages = [
+        { role: "system", content: "Ты строгий профессор травматологии в медицинском университете. Ты проводишь устный экзамен. Ты задаешь студенту клинические вопросы по травматологии (переломы, вывихи, анатомия, лечение). Если студент отвечает верно, ты грубо хвалишь его. Если ошибается, ты жестко ругаешь его на русском языке, объясняешь правильный ответ и требуешь повторить. Твоя речь должна быть на медицинские темы. Не выходи за рамки травматологии. Вопросы задавай кратко и по делу." }
+    ];
+
+    // Тарзи талаффуз (бо овози инсонии OpenAI TTS)
+    async function speak(text, lang='ru-RU') {
+        if (!apiKey) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                window.speechSynthesis.speak(utterance);
+            }
+            return;
+        }
+        try {
+            const response = await fetch('https://api.openai.com/v1/audio/speech', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: "tts-1", input: text, voice: "onyx" }) // Onyx - овози мардонаи сахт
+            });
+            if (!response.ok) throw new Error('TTS error');
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+            audio.onended = () => URL.revokeObjectURL(audioUrl);
+        } catch (error) {
+            // Фоллбэк ба овози браузер
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    }
+
+    function addBotMessage(text) {
+        const div = document.createElement('div');
+        div.className = 'chat-msg chat-bot';
+        div.innerHTML = text;
+        chatHistory.appendChild(div);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        let cleanText = text.replace(/<b>|<\/b>|<i>|<\/i>/g, '').replace(/<[^>]*>/g, ' ').trim();
+        speak(cleanText, 'ru-RU');
+    }
+
+    function addUserMessage(text) {
+        const div = document.createElement('div');
+        div.className = 'chat-msg chat-user';
+        div.textContent = text;
+        chatHistory.appendChild(div);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    async function processUserInput(inputText) {
+        if (!inputText.trim()) return;
+        if (!apiKey) {
+            addBotMessage("⚠️ API Key-ро дар боло гузоред!");
+            return;
+        }
+        addUserMessage(inputText);
+        chatInput.value = '';
+        chatMessages.push({ role: "user", content: inputText });
+
+        try {
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: chatMessages,
+                    max_tokens: 250
+                })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error.message);
+            }
+            const data = await response.json();
+            const botReply = data.choices[0].message.content;
+            chatMessages.push({ role: "assistant", content: botReply });
+            addBotMessage(botReply);
+        } catch (error) {
+            addBotMessage("❌ Хатогӣ: " + error.message);
+            chatMessages.pop();
+        }
+    }
+
+    function sendMessage() { processUserInput(chatInput.value); }
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+    document.getElementById('voiceBtn').addEventListener('click', function() {
+        const btn = this;
+        if (!('webkitSpeechRecognition' in window)) return alert("Браузер микрофонро дастгирӣ намекунад.");
+        const recognition = new window.webkitSpeechRecognition();
+        recognition.lang = 'ru-RU'; // Барои гуфтани ҷавоб бо забони русӣ
+        recognition.start();
+        btn.classList.add('listening'); btn.textContent = "⏳";
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            btn.classList.remove('listening'); btn.textContent = "🎤";
+            processUserInput(transcript);
+        };
+        recognition.onerror = () => { btn.classList.remove('listening'); btn.textContent = "🎤"; };
+    });
+
+    addBotMessage("Начнём экзамен. Скажите, какие вы знаете виды переломов? Опишите кратко.");
+</script>
+</body>
+</html>
