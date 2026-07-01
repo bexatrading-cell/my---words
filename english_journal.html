@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My English Journal</title>
+    <style>
+        :root {
+            --paper-color: #fcf8ec;
+            --ink-color: #2c3e50;
+            --shadow-color: rgba(0,0,0,0.15);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Georgia', 'Times New Roman', serif; }
+        body {
+            background: #ece8df;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        .journal-container {
+            width: 100%;
+            max-width: 700px;
+            background: var(--paper-color);
+            padding: 40px 40px 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px var(--shadow-color), inset 0 0 0 1px #fff6e5;
+            position: relative;
+            border: 1px solid #d4c9b3;
+            background-image: repeating-linear-gradient(transparent, transparent 29px, #d4c9b3 29px, #d4c9b3 30px);
+        }
+        .journal-container::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 40px;
+            bottom: 40px;
+            width: 2px;
+            background: #b3a28a;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding-left: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #d4c9b3;
+            padding-bottom: 15px;
+        }
+        .journal-title { font-size: 28px; font-weight: bold; color: #4a3b27; letter-spacing: 1px; }
+        .journal-date { font-size: 18px; color: #6a5a46; font-weight: 500; }
+
+        .title-area { padding: 5px 20px 0 20px; position: relative; z-index: 1; }
+        .title-input {
+            width: 100%; background: transparent; border: none; border-bottom: 1px dashed #b3a28a;
+            outline: none; font-size: 20px; font-weight: bold; color: var(--ink-color);
+            font-family: 'Georgia', serif; margin-bottom: 10px;
+        }
+        .title-input::placeholder { color: #b3a28a; font-weight: normal; font-size: 16px; }
+
+        .entry-area { padding: 10px 20px 0 20px; position: relative; z-index: 1; }
+        .entry-textarea {
+            width: 100%; min-height: 200px; background: transparent; border: none;
+            outline: none; resize: vertical; font-size: 18px; line-height: 30px;
+            color: var(--ink-color); font-family: 'Georgia', serif;
+        }
+        .entry-textarea::placeholder { color: #b3a28a; font-style: italic; }
+
+        /* Намоиши акс */
+        .photo-preview-area {
+            margin-top: 10px;
+            position: relative;
+            display: none; /* Дар аввал пинҳон аст */
+            border: 1px solid #d4c9b3;
+            border-radius: 8px;
+            padding: 5px;
+            background: #fffdf7;
+        }
+        .photo-preview-area img {
+            width: 100%; height: auto; border-radius: 4px; display: block;
+        }
+        .btn-remove-photo {
+            position: absolute; top: -10px; right: -10px;
+            background: #d4c9b3; border: none; border-radius: 50%;
+            width: 28px; height: 28px; cursor: pointer;
+            font-weight: bold; color: #4a3b27; font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .btn-remove-photo:hover { background: #b3a28a; }
+
+        /* Контролҳо */
+        .controls {
+            display: flex; flex-direction: column; gap: 15px;
+            margin-top: 20px; padding-top: 15px;
+            border-top: 1px solid #d4c9b3; padding-left: 20px;
+        }
+        .top-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 10px;
+        }
+        .nav-buttons { display: flex; gap: 12px; }
+        .btn-nav {
+            background: #f4ecd8; border: 1px solid #d4c9b3;
+            color: #4a3b27; padding: 8px 18px; border-radius: 20px;
+            cursor: pointer; font-size: 16px; transition: 0.2s; font-family: inherit;
+        }
+        .btn-nav:hover { background: #e8dcc8; border-color: #8b5a2b; }
+
+        .action-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .btn-save {
+            background: #4a3b27; color: #fcf8ec; border: none;
+            padding: 8px 25px; border-radius: 20px; cursor: pointer;
+            font-size: 16px; font-weight: bold; transition: 0.2s; font-family: inherit;
+        }
+        .btn-save:hover { background: #2c1f12; transform: scale(1.02); }
+        
+        .btn-camera {
+            background: #6a5a46; color: #fcf8ec; border: none;
+            padding: 8px 18px; border-radius: 20px; cursor: pointer;
+            font-size: 16px; font-weight: bold; transition: 0.2s; font-family: inherit;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-camera:hover { background: #4a3b27; transform: scale(1.05); }
+
+        /* Ҷустуҷӯ */
+        .search-area { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 5px; }
+        .search-input {
+            flex: 1; min-width: 150px; padding: 8px 15px;
+            border: 1px solid #d4c9b3; border-radius: 20px;
+            background: #fffdf7; outline: none; font-family: inherit;
+        }
+        .search-input:focus { border-color: #4a3b27; }
+        .btn-search {
+            background: #6a5a46; color: #fcf8ec; border: none;
+            padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;
+        }
+        .btn-search:hover { background: #4a3b27; }
+        .btn-clear-search {
+            background: #e6dac8; color: #4a3b27; border: none; padding: 8px 15px;
+            border-radius: 20px; cursor: pointer; display: none;
+        }
+        .btn-clear-search:hover { background: #d4c9b3; }
+
+        .search-results {
+            display: none; margin-top: 10px; max-height: 250px; overflow-y: auto;
+            background: #f9f7ef; border: 1px solid #d4c9b3; border-radius: 8px; padding: 10px;
+        }
+        .search-result-item { padding: 8px; border-bottom: 1px solid #e2d9c6; cursor: pointer; }
+        .search-result-item:hover { background: #f4ecd8; }
+        .search-result-title { font-weight: bold; font-size: 16px; color: #4a3b27; }
+        .search-result-date { font-size: 13px; color: #888; margin-left: 10px; }
+        .search-result-preview { font-size: 14px; color: #666; margin-top: 4px; }
+
+        @media (max-width: 600px) {
+            .journal-container { padding: 20px 15px; }
+            .top-controls { flex-direction: column; align-items: stretch; }
+            .nav-buttons { justify-content: center; }
+            .action-group { justify-content: center; }
+            .search-area { flex-wrap: wrap; }
+            .search-input { width: 100%; }
+            .entry-textarea { min-height: 150px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="journal-container">
+    <div class="header">
+        <div class="journal-title">📖 My English Journal</div>
+        <div class="journal-date" id="displayDate">Сегодня</div>
+    </div>
+
+    <div class="title-area">
+        <input type="text" class="title-input" id="lessonTitle" placeholder="Унвони дарс (масалан: Past Simple)">
+    </div>
+
+    <div class="entry-area">
+        <textarea class="entry-textarea" id="lessonInput" placeholder="Имрӯз чӣ дарс гузаштед? Нависед..."></textarea>
+        
+        <!-- Ҷой барои акс -->
+        <div class="photo-preview-area" id="photoPreviewArea">
+            <img id="photoPreview" alt="Акси дарс">
+            <button class="btn-remove-photo" id="removePhotoBtn" title="Тоза кардани акс">✕</button>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="top-controls">
+            <div class="nav-buttons">
+                <button class="btn-nav" id="prevBtn">← Вчера</button>
+                <button class="btn-nav" id="nextBtn">Завтра →</button>
+            </div>
+            <div class="action-group">
+                <button class="btn-camera" id="cameraBtn">📷 Акс гирифтан</button>
+                <button class="btn-save" id="saveBtn">💾 Сабт кардан</button>
+            </div>
+        </div>
+
+        <div class="search-area">
+            <input type="text" class="search-input" id="searchInput" placeholder="Ҷустуҷӯи сабтҳо...">
+            <button class="btn-search" id="searchBtn">🔍 Ҷустуҷӯ</button>
+            <button class="btn-clear-search" id="clearSearchBtn">✕ Тоза</button>
+        </div>
+        
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<!-- Файли пинҳон барои интихоби акс (барои ҳамаи браузерҳо кор мекунад) -->
+<input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;">
+
+<script>
+    // 1. ИДОРАИ МАЪЛУМОТ
+    let journalEntries = JSON.parse(localStorage.getItem('englishNotes')) || {};
+
+    // 2. ИДОРАИ САНА
+    let currentDate = new Date();
+    currentDate.setHours(0,0,0,0);
+    let isSearchMode = false;
+    let currentPhotoData = null; // Барои нигоҳ доштани акс дар хотира пеш аз сабт
+
+    function formatDateToDisplay(date) {
+        return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    function getDateKey(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    // 3. БОРКУНӢ ВА НАМОИШ
+    function loadEntry() {
+        if(isSearchMode) return;
+        const dateKey = getDateKey(currentDate);
+        document.getElementById('displayDate').textContent = formatDateToDisplay(currentDate);
+        
+        let entryData = journalEntries[dateKey];
+        if (typeof entryData === 'string') {
+            entryData = { title: '', content: entryData, image: null };
+            journalEntries[dateKey] = entryData;
+        }
+
+        document.getElementById('lessonTitle').value = entryData ? entryData.title || '' : '';
+        document.getElementById('lessonInput').value = entryData ? entryData.content || '' : '';
+        
+        // Барқарор кардани акс
+        if (entryData && entryData.image) {
+            currentPhotoData = entryData.image;
+            document.getElementById('photoPreview').src = entryData.image;
+            document.getElementById('photoPreviewArea').style.display = 'block';
+        } else {
+            clearPhotoPreview();
+        }
+    }
+
+    function clearPhotoPreview() {
+        currentPhotoData = null;
+        document.getElementById('photoPreview').src = '';
+        document.getElementById('photoPreviewArea').style.display = 'none';
+    }
+
+    // 4. ЛОГИКАИ АКС
+    document.getElementById('cameraBtn').addEventListener('click', function() {
+        // Барои кор кардан дар телефон ва компютер
+        document.getElementById('fileInput').click();
+    });
+
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const dataUrl = e.target.result;
+            // Фишурдани акс барои кам кардани андозаи он
+            compressImage(dataUrl, 800, 0.7).then(compressedUrl => {
+                currentPhotoData = compressedUrl;
+                document.getElementById('photoPreview').src = compressedUrl;
+                document.getElementById('photoPreviewArea').style.display = 'block';
+                // Тоза кардани инпут барои интихоби дубора як файл
+                document.getElementById('fileInput').value = '';
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Тоза кардани акс
+    document.getElementById('removePhotoBtn').addEventListener('click', function() {
+        clearPhotoPreview();
+    });
+
+    // Функсияи фишурдани акс
+    function compressImage(dataUrl, maxWidth, quality) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = dataUrl;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+        });
+    }
+
+    // 5. САБТ КАРДАН
+    function saveEntry() {
+        if(isSearchMode) return;
+        const dateKey = getDateKey(currentDate);
+        const title = document.getElementById('lessonTitle').value.trim();
+        const content = document.getElementById('lessonInput').value.trim();
+        const image = currentPhotoData; // Акси фишурдашуда
+
+        if (content || title || image) {
+            journalEntries[dateKey] = { title: title, content: content, image: image };
+        } else {
+            delete journalEntries[dateKey];
+        }
+        
+        localStorage.setItem('englishNotes', JSON.stringify(journalEntries));
+        // Эффекти сабт
+        const saveBtn = document.getElementById('saveBtn');
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = "✅ Сабт шуд!";
+        setTimeout(() => { saveBtn.textContent = originalText; }, 2000);
+    }
+
+    function changeDay(delta) {
+        if(isSearchMode) exitSearch();
+        saveEntry();
+        currentDate.setDate(currentDate.getDate() + delta);
+        loadEntry();
+    }
+
+    // 6. ҶУСТУҶӮ
+    function performSearch() {
+        const term = document.getElementById('searchInput').value.toLowerCase().trim();
+        if (!term) return;
+
+        isSearchMode = true;
+        document.getElementById('clearSearchBtn').style.display = 'inline-block';
+        const resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = '';
+        resultsContainer.style.display = 'block';
+
+        let found = false;
+        for (const [dateKey, data] of Object.entries(journalEntries)) {
+            let title = '', content = '';
+            if (typeof data === 'string') { content = data; } 
+            else { title = data.title || ''; content = data.content || ''; }
+
+            if (title.toLowerCase().includes(term) || content.toLowerCase().includes(term)) {
+                found = true;
+                const div = document.createElement('div');
+                div.className = 'search-result-item';
+                div.onclick = () => {
+                    const parts = dateKey.split('-');
+                    currentDate = new Date(parts[0], parts[1]-1, parts[2]);
+                    exitSearch(); loadEntry();
+                };
+                const preview = content.substring(0, 60) + (content.length > 60 ? '...' : '');
+                div.innerHTML = `<div class="search-result-title">${title || 'Бе унвон'} <span class="search-result-date">(${formatDateToDisplay(new Date(dateKey))})</span></div><div class="search-result-preview">${preview}</div>`;
+                resultsContainer.appendChild(div);
+            }
+        }
+        if (!found) resultsContainer.innerHTML = `<div style="padding: 10px; color:#888;">Чизе ёфт нашуд.</div>`;
+    }
+
+    function exitSearch() {
+        isSearchMode = false;
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('searchResults').innerHTML = '';
+        document.getElementById('clearSearchBtn').style.display = 'none';
+        document.getElementById('searchInput').value = '';
+    }
+
+    // 7. РӮЙДОДҲО
+    document.getElementById('saveBtn').addEventListener('click', saveEntry);
+    document.getElementById('prevBtn').addEventListener('click', () => changeDay(-1));
+    document.getElementById('nextBtn').addEventListener('click', () => changeDay(1));
+    document.getElementById('searchBtn').addEventListener('click', performSearch);
+    document.getElementById('clearSearchBtn').addEventListener('click', exitSearch);
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch();
+    });
+
+    // 8. БАРГУЗОРИИ АВВАЛ ВА САБТИ АВТОМАТӢ
+    loadEntry();
+    window.addEventListener('beforeunload', saveEntry);
+</script>
+</body>
+</html>
