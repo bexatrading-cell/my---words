@@ -9,7 +9,6 @@
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #333; margin-bottom: 20px; font-size: 26px; }
         .card { background: #f8f9fa; margin-bottom: 15px; padding: 15px; border-radius: 12px; border-left: 4px solid #4a90e2; }
-        
         .word-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; }
         .word-row strong { min-width: 90px; color: #2c3e50; display: flex; align-items: center; gap: 8px; font-size: 18px; }
         
@@ -46,49 +45,63 @@
         .form-group button:hover { background: #2ecc71; }
         .footer-note { text-align: center; font-size: 13px; color: #7f8c8d; margin-top: 20px; }
 
-        /* ✅ ИСЛОҲИ МУҲИМ БАРОИ ТЕЛЕФОН: Ҳамаи забонҳо дар як хат */
+        /* ✅ ИСЛОҲИ ПУРРА БАРОИ ТЕЛЕФОН (Экран пурра, як хат, ҳуруфҳо хурд) */
         @media (max-width: 600px) {
-            body { padding: 10px; }
-            .container { padding: 15px; border-radius: 12px; }
-            h1 { font-size: 22px; margin-bottom: 15px; }
+            html, body { margin: 0; padding: 0; overflow-x: hidden; }
+            body { padding: 0; min-height: 100vh; display: flex; align-items: flex-start; }
             
-            .card { padding: 12px; }
+            .container {
+                width: 100%;
+                max-width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                padding: 15px 10px;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+            }
+            h1 { font-size: 20px; margin-bottom: 15px; }
             
-            /* ТАҒЙИРОТИ АСОСӢ: Ба ҷои амудӣ, ҳоло уфуқӣ (як хат) */
-            .word-row {
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-items: center;
-                justify-content: flex-start;
-                gap: 6px;
-            }
-            .word-row strong {
-                min-width: auto;
-                width: auto;
-                font-size: 16px;
-                margin-right: 5px;
-            }
-            .lang-tags {
-                width: auto;
-                flex-wrap: wrap;
-                gap: 4px;
-            }
-            .lang-tags span {
-                padding: 3px 8px;
-                font-size: 12px;
-            }
+            .card { padding: 10px; margin-bottom: 10px; }
+            .word-row { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 4px; }
+            .word-row strong { font-size: 15px; min-width: auto; width: auto; margin-right: 4px; gap: 4px; }
+            .sound-btn { font-size: 14px; margin-left: 2px; }
             
-            .sound-btn { font-size: 16px; margin-left: 3px; }
+            .lang-tags { gap: 4px; }
+            .lang-tags span { padding: 2px 6px; font-size: 11px; }
 
-            .btn-group { flex-direction: column; width: 100%; gap: 8px; }
-            .btn, .btn-outline { width: 100%; padding: 14px; font-size: 16px; text-align: center; }
+            .btn-group { gap: 6px; margin-bottom: 15px; }
+            .btn, .btn-outline { width: 100%; padding: 10px; font-size: 14px; box-sizing: border-box; text-align: center; }
 
-            .category-bar { gap: 6px; }
-            .cat-btn { padding: 6px 12px; font-size: 12px; flex: 1; min-width: 60px; text-align: center; }
+            .category-bar { 
+                flex-wrap: nowrap; 
+                overflow-x: auto; 
+                justify-content: flex-start; 
+                gap: 5px; 
+                padding-bottom: 10px; 
+                margin-bottom: 15px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .category-bar::-webkit-scrollbar { display: none; }
+            .cat-btn { 
+                flex: 0 0 auto; 
+                padding: 4px 10px; 
+                font-size: 10px; 
+                white-space: nowrap; 
+            }
 
-            .form-group { flex-direction: column; gap: 10px; }
-            .form-group input, .form-group select { width: 100%; padding: 14px; font-size: 16px; min-width: unset; }
-            .form-group button { width: 100%; padding: 14px; font-size: 16px; }
+            .add-form { margin-top: auto; padding-top: 15px; }
+            .form-group { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+            .form-group input, .form-group select { 
+                flex: 1 1 40%; 
+                min-width: 70px; 
+                padding: 8px; 
+                font-size: 13px; 
+            }
+            .form-group button { width: 100%; padding: 10px; font-size: 14px; }
+            .footer-note { font-size: 11px; margin-top: 10px; }
         }
     </style>
 </head>
@@ -125,12 +138,24 @@
                 </select>
                 <button id="addBtn">Добавить</button>
             </div>
-            <p style="font-size:14px; color:#888; margin-top:10px; text-align:center;">Калимаҳо дар браузер нигоҳ дошта мешаванд. 🔊 барои шунидани талаффуз.</p>
+            <p style="font-size:13px; color:#888; margin-top:10px; text-align:center;">Калимаҳо дар браузер нигоҳ дошта мешаванд.</p>
         </div>
         <div class="footer-note">Нажми на размытый перевод, чтобы увидеть его. Нажми 🔊, чтобы услышать произношение.</div>
     </div>
 
     <script>
+        // ✅ БАРОИ ПИНҲОН КАРДАНИ САТРИ БРАУЗЕР ДАР ТЕЛЕФОН
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 1);
+            }, 100);
+        });
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 1);
+            }, 200);
+        });
+
         let words = [
             { de: "Hallo", en: "Hello", ru: "Привет", tj: "Салом", category: "существительное" },
             { de: "Danke", en: "Thank you", ru: "Спасибо", tj: "Ташаккур", category: "существительное" },
@@ -149,12 +174,8 @@
         }
 
         function speak(word, lang) {
-            if (!window.speechSynthesis) {
-                alert("Браузери шумо талаффузро дастгирӣ намекунад.");
-                return;
-            }
+            if (!window.speechSynthesis) return;
             window.speechSynthesis.cancel();
-
             const utterance = new SpeechSynthesisUtterance(word);
             utterance.lang = lang;
             utterance.rate = 0.9;
@@ -187,7 +208,7 @@
                             <span class="en-bg">EN</span>
                             <span class="hidden-translate" data-index="${index}" data-lang="en">
                                 ${word.en}
-                                <span class="sound-btn" onclick="speak('${word.en}', 'en-US')" title="Шунидани талаффузи англисӣ" style="margin-left:0; font-size:14px; background:transparent;">🔊</span>
+                                <span class="sound-btn" onclick="speak('${word.en}', 'en-US')" title="Шунидани талаффузи англисӣ" style="margin-left:0; font-size:12px; background:transparent;">🔊</span>
                             </span>
                         </div>
                         <div class="lang-tags">
