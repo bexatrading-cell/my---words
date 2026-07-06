@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Тренажёр слов (Deutsch)</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 20px; font-size: 26px; }
+        .card { background: #f8f9fa; margin-bottom: 15px; padding: 15px; border-radius: 12px; border-left: 4px solid #4a90e2; }
+        
+        .word-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .word-row strong { min-width: 90px; color: #2c3e50; display: flex; align-items: center; gap: 8px; font-size: 18px; }
+        
+        .hidden-translate { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #555; font-size: 15px; }
+        .hidden-translate:hover { filter: blur(2px); }
+        .hidden-translate.revealed { filter: blur(0); color: #000000; font-weight: bold; }
+        
+        .lang-tags { display: flex; gap: 10px; font-size: 14px; flex-wrap: wrap; align-items: center; }
+        .lang-tags span { padding: 4px 10px; border-radius: 4px; color: white; font-weight: bold; }
+        .de-bg { background: #4a90e2; }
+        .en-bg { background: #27ae60; }
+        .ru-bg { background: #e74c3c; }
+        .tj-bg { background: #f39c12; }
+        
+        .btn-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn { background: #4a90e2; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
+        .btn:hover { background: #357abd; }
+        .btn-outline { background: transparent; border: 2px solid #4a90e2; color: #4a90e2; }
+
+        .category-bar { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .cat-btn { background: transparent; border: 1px solid #4a90e2; color: #4a90e2; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 14px; }
+        .cat-btn:hover { background: #e3f2fd; }
+        .cat-btn.active { background: #4a90e2; color: white; }
+
+        .sound-btn { cursor: pointer; margin-left: 5px; font-size: 18px; transition: 0.2s; background: #f1f3f4; padding: 2px 4px; border-radius: 50%; line-height: 1; display: inline-block; }
+        .sound-btn:hover { background: #e2e6ea; transform: scale(1.1); }
+        .sound-btn:active { transform: scale(0.9); }
+
+        .add-form { margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee; }
+        .add-form h3 { margin-top: 0; }
+        .form-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+        .form-group input, .form-group select { flex: 1; min-width: 80px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .form-group button { padding: 12px 20px; border: none; background: #27ae60; color: white; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .form-group button:hover { background: #2ecc71; }
+        .footer-note { text-align: center; font-size: 13px; color: #7f8c8d; margin-top: 20px; }
+
+        /* ✅ ИСЛОҲИ МУҲИМ БАРОИ ТЕЛЕФОН: Ҳамаи забонҳо дар як хат */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 15px; border-radius: 12px; }
+            h1 { font-size: 22px; margin-bottom: 15px; }
+            
+            .card { padding: 12px; }
+            
+            /* ТАҒЙИРОТИ АСОСӢ: Ба ҷои амудӣ, ҳоло уфуқӣ (як хат) */
+            .word-row {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 6px;
+            }
+            .word-row strong {
+                min-width: auto;
+                width: auto;
+                font-size: 16px;
+                margin-right: 5px;
+            }
+            .lang-tags {
+                width: auto;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .lang-tags span {
+                padding: 3px 8px;
+                font-size: 12px;
+            }
+            
+            .sound-btn { font-size: 16px; margin-left: 3px; }
+
+            .btn-group { flex-direction: column; width: 100%; gap: 8px; }
+            .btn, .btn-outline { width: 100%; padding: 14px; font-size: 16px; text-align: center; }
+
+            .category-bar { gap: 6px; }
+            .cat-btn { padding: 6px 12px; font-size: 12px; flex: 1; min-width: 60px; text-align: center; }
+
+            .form-group { flex-direction: column; gap: 10px; }
+            .form-group input, .form-group select { width: 100%; padding: 14px; font-size: 16px; min-width: unset; }
+            .form-group button { width: 100%; padding: 14px; font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Тренажёр слов (Deutsch)</h1>
+        <div class="btn-group">
+            <button class="btn" id="revealAllBtn">Показать все переводы</button>
+            <button class="btn btn-outline" id="hideAllBtn">Скрыть все переводы</button>
+        </div>
+
+        <div class="category-bar" id="categoryBar">
+            <button class="cat-btn active" onclick="setCategory('all')">Все</button>
+            <button class="cat-btn" onclick="setCategory('существительное')">Существительное</button>
+            <button class="cat-btn" onclick="setCategory('глагол')">Глагол</button>
+            <button class="cat-btn" onclick="setCategory('прилагательное')">Прилагательное</button>
+            <button class="cat-btn" onclick="setCategory('другое')">Другое</button>
+        </div>
+
+        <div id="wordList"></div>
+
+        <div class="add-form">
+            <h3>➕ Добавить своё слово</h3>
+            <div class="form-group">
+                <input type="text" id="inputDe" placeholder="Немецкий">
+                <input type="text" id="inputEn" placeholder="Английский">
+                <input type="text" id="inputRu" placeholder="Русский">
+                <input type="text" id="inputTj" placeholder="Таджикский">
+                <select id="inputCategory">
+                    <option value="существительное">Существительное</option>
+                    <option value="глагол">Глагол</option>
+                    <option value="прилагательное">Прилагательное</option>
+                    <option value="другое">Другое</option>
+                </select>
+                <button id="addBtn">Добавить</button>
+            </div>
+            <p style="font-size:14px; color:#888; margin-top:10px; text-align:center;">Калимаҳо дар браузер нигоҳ дошта мешаванд. 🔊 барои шунидани талаффуз.</p>
+        </div>
+        <div class="footer-note">Нажми на размытый перевод, чтобы увидеть его. Нажми 🔊, чтобы услышать произношение.</div>
+    </div>
+
+    <script>
+        let words = [
+            { de: "Hallo", en: "Hello", ru: "Привет", tj: "Салом", category: "существительное" },
+            { de: "Danke", en: "Thank you", ru: "Спасибо", tj: "Ташаккур", category: "существительное" },
+            { de: "Bitte", en: "Please", ru: "Пожалуйста", tj: "Лутфан", category: "существительное" },
+            { de: "Auf Wiedersehen", en: "Goodbye", ru: "До свидания", tj: "Хайр", category: "существительное" },
+            { de: "Gehen", en: "Go", ru: "Идти", tj: "Рафтан", category: "глагол" },
+            { de: "Sagen", en: "Say", ru: "Сказать", tj: "Гуфтан", category: "глагол" },
+            { de: "Groß", en: "Big", ru: "Большой", tj: "Калон", category: "прилагательное" },
+            { de: "Klein", en: "Small", ru: "Маленький", tj: "Хурд", category: "прилагательное" }
+        ];
+
+        let currentCategory = 'all';
+
+        if (localStorage.getItem('savedDeWords')) {
+            words = JSON.parse(localStorage.getItem('savedDeWords'));
+        }
+
+        function speak(word, lang) {
+            if (!window.speechSynthesis) {
+                alert("Браузери шумо талаффузро дастгирӣ намекунад.");
+                return;
+            }
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = lang;
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function renderWords() {
+            const list = document.getElementById('wordList');
+            list.innerHTML = '';
+
+            const filteredWords = currentCategory === 'all' 
+                ? words 
+                : words.filter(w => w.category === currentCategory);
+
+            if (filteredWords.length === 0) {
+                list.innerHTML = `<p style="text-align:center; color:#888; padding:20px;">Барои ин категория калима ёфт нашуд.</p>`;
+                return;
+            }
+
+            filteredWords.forEach((word, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="word-row">
+                        <strong>
+                            ${word.de}
+                            <span class="sound-btn" onclick="speak('${word.de}', 'de-DE')" title="Шунидани талаффузи немисӣ">🔊</span>
+                        </strong>
+                        <div class="lang-tags">
+                            <span class="en-bg">EN</span>
+                            <span class="hidden-translate" data-index="${index}" data-lang="en">
+                                ${word.en}
+                                <span class="sound-btn" onclick="speak('${word.en}', 'en-US')" title="Шунидани талаффузи англисӣ" style="margin-left:0; font-size:14px; background:transparent;">🔊</span>
+                            </span>
+                        </div>
+                        <div class="lang-tags">
+                            <span class="ru-bg">RU</span>
+                            <span class="hidden-translate" data-index="${index}" data-lang="ru">${word.ru}</span>
+                        </div>
+                        <div class="lang-tags">
+                            <span class="tj-bg">TJ</span>
+                            <span class="hidden-translate" data-index="${index}" data-lang="tj">${word.tj}</span>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            document.querySelectorAll('.hidden-translate').forEach(el => {
+                el.addEventListener('click', function() {
+                    this.classList.toggle('revealed');
+                });
+            });
+        }
+
+        function saveWords() {
+            localStorage.setItem('savedDeWords', JSON.stringify(words));
+        }
+
+        document.getElementById('revealAllBtn').addEventListener('click', () => {
+            document.querySelectorAll('.hidden-translate').forEach(el => el.classList.add('revealed'));
+        });
+
+        document.getElementById('hideAllBtn').addEventListener('click', () => {
+            document.querySelectorAll('.hidden-translate').forEach(el => el.classList.remove('revealed'));
+        });
+
+        function setCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            const btns = document.querySelectorAll('.cat-btn');
+            btns.forEach(btn => {
+                if (btn.textContent.trim() === category || (category === 'all' && btn.textContent.trim() === 'Все')) {
+                    btn.classList.add('active');
+                }
+            });
+            renderWords();
+        }
+
+        document.getElementById('addBtn').addEventListener('click', () => {
+            const de = document.getElementById('inputDe').value.trim();
+            const en = document.getElementById('inputEn').value.trim();
+            const ru = document.getElementById('inputRu').value.trim();
+            const tj = document.getElementById('inputTj').value.trim();
+            const category = document.getElementById('inputCategory').value;
+
+            if (de && en && ru && tj) {
+                words.push({ de, en, ru, tj, category });
+                saveWords();
+                renderWords();
+                document.getElementById('inputDe').value = '';
+                document.getElementById('inputEn').value = '';
+                document.getElementById('inputRu').value = '';
+                document.getElementById('inputTj').value = '';
+            } else {
+                alert('Лутфан ҳар чор майдонро пур кунед!');
+            }
+        });
+
+        renderWords();
+    </script>
+</body>
+</html>
