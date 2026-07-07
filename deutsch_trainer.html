@@ -12,21 +12,24 @@
         .word-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; }
         .word-row strong { min-width: 90px; color: #2c3e50; display: flex; align-items: center; gap: 8px; font-size: 18px; }
         
-        /* ✅ ИСЛОҲИ РАНГ: Аз #555 ба #000 (Сиёҳ) иваз карда шуд */
-        .hidden-translate { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #000; font-size: 15px; }
+        .hidden-translate { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #000 !important; font-weight: bold; font-size: 15px; }
         .hidden-translate:hover { filter: blur(2px); }
         .hidden-translate.revealed { filter: blur(0); color: #000000; font-weight: bold; }
         
-        .de-blur { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #000; font-size: 15px; }
+        .de-blur { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #000 !important; font-weight: bold; font-size: 15px; }
         .de-blur:hover { filter: blur(2px); }
         .de-blur.revealed { filter: blur(0); color: #000000; font-weight: bold; }
         
         .lang-tags { display: flex; gap: 10px; font-size: 14px; flex-wrap: wrap; align-items: center; }
-        .lang-tags span { padding: 4px 10px; border-radius: 4px; color: white; font-weight: bold; }
-        .de-bg { background: #4a90e2; }
-        .en-bg { background: #27ae60; }
-        .ru-bg { background: #e74c3c; }
-        .tj-bg { background: #f39c12; }
+        
+        /* ✅ ИСЛОҲИ МУҲИМ: Агар калима бе клас бошад (RU➔DE), он сиёҳ мемонад, на сафед */
+        .lang-tags span { padding: 4px 10px; border-radius: 4px; font-weight: bold; }
+        .lang-tags span:not(.en-bg):not(.ru-bg):not(.tj-bg):not(.de-bg) { color: #000 !important; }
+        
+        .de-bg { background: #4a90e2; color: white; }
+        .en-bg { background: #27ae60; color: white; }
+        .ru-bg { background: #e74c3c; color: white; }
+        .tj-bg { background: #f39c12; color: white; }
         
         .btn-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
         .btn { background: #4a90e2; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
@@ -55,9 +58,8 @@
 
         .footer-note { text-align: center; font-size: 13px; color: #7f8c8d; margin-top: 20px; }
 
-        /* ✅ ТУГМАИ РЕЖИМ (ТАНҲО ДАР ТЕЛЕФОН) */
-        .mobile-mode-btn {
-            display: none;
+        /* ✅ ТУГМАИ РЕЖИМ (Барои ПК ва Телефон) */
+        .mode-btn {
             position: fixed;
             bottom: 20px;
             left: 20px;
@@ -72,8 +74,9 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             cursor: pointer;
             transition: 0.2s;
+            display: flex;
         }
-        .mobile-mode-btn:hover { background: #357abd; transform: scale(1.05); }
+        .mode-btn:hover { background: #357abd; transform: scale(1.05); }
 
         @media (max-width: 600px) {
             html, body { margin: 0; padding: 0; overflow-x: hidden; }
@@ -98,7 +101,7 @@
             .sync-actions { gap: 5px; }
             .btn-small { padding: 6px 10px; font-size: 12px; }
             .footer-note { font-size: 11px; margin-top: 10px; }
-            .mobile-mode-btn { display: flex; }
+            .mode-btn { display: flex; bottom: 15px; left: 15px; padding: 6px 12px; font-size: 11px; }
         }
     </style>
 </head>
@@ -147,7 +150,7 @@
         <div class="footer-note">Барои иваз кардани режими омӯзиш, тугмаи кунҷи чапро истифода баред.</div>
     </div>
 
-    <button class="mobile-mode-btn" id="modeToggleBtn">Режим: DE ➔ RU</button>
+    <button class="mode-btn" id="modeToggleBtn">Режим: DE ➔ RU</button>
 
     <script>
         window.addEventListener('load', function() {
@@ -206,7 +209,7 @@
 
                 if (mode === 'reverse') {
                     deClasses += ' de-blur';
-                    othersClasses = '';
+                    othersClasses = ''; // ✅ Дар ин ҷо классро тоза мекунем, аммо CSS-и мо онро сиёҳ нигоҳ медорад
                 } else {
                     othersClasses = 'hidden-translate';
                 }
