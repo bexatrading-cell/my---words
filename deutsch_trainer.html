@@ -16,6 +16,10 @@
         .hidden-translate:hover { filter: blur(2px); }
         .hidden-translate.revealed { filter: blur(0); color: #000000; font-weight: bold; }
         
+        .de-blur { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #555; font-size: 15px; }
+        .de-blur:hover { filter: blur(2px); }
+        .de-blur.revealed { filter: blur(0); color: #000000; font-weight: bold; }
+        
         .lang-tags { display: flex; gap: 10px; font-size: 14px; flex-wrap: wrap; align-items: center; }
         .lang-tags span { padding: 4px 10px; border-radius: 4px; color: white; font-weight: bold; }
         .de-bg { background: #4a90e2; }
@@ -43,65 +47,61 @@
         .form-group input, .form-group select { flex: 1; min-width: 80px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
         .form-group button { padding: 12px 20px; border: none; background: #27ae60; color: white; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
         .form-group button:hover { background: #2ecc71; }
+        
+        .sync-actions { display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+        .btn-small { padding: 8px 16px; font-size: 14px; background: #888; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-small:hover { background: #666; }
+
         .footer-note { text-align: center; font-size: 13px; color: #7f8c8d; margin-top: 20px; }
 
-        /* ✅ ИСЛОҲИ ПУРРА БАРОИ ТЕЛЕФОН (Экран пурра, як хат, ҳуруфҳо хурд) */
+        /* ✅ ТУГМАИ РЕЖИМ (ТАНҲО ДАР ТЕЛЕФОН, КУНҶИ ЧАП) */
+        .mobile-mode-btn {
+            display: none; /* Дар компютер пинҳон аст */
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .mobile-mode-btn:hover { background: #357abd; transform: scale(1.05); }
+
         @media (max-width: 600px) {
             html, body { margin: 0; padding: 0; overflow-x: hidden; }
             body { padding: 0; min-height: 100vh; display: flex; align-items: flex-start; }
-            
-            .container {
-                width: 100%;
-                max-width: 100%;
-                min-height: 100vh;
-                border-radius: 0;
-                box-shadow: none;
-                margin: 0;
-                padding: 15px 10px;
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-            }
+            .container { width: 100%; max-width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; margin: 0; padding: 15px 10px; box-sizing: border-box; display: flex; flex-direction: column; }
             h1 { font-size: 20px; margin-bottom: 15px; }
-            
             .card { padding: 10px; margin-bottom: 10px; }
             .word-row { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 4px; }
             .word-row strong { font-size: 15px; min-width: auto; width: auto; margin-right: 4px; gap: 4px; }
             .sound-btn { font-size: 14px; margin-left: 2px; }
-            
             .lang-tags { gap: 4px; }
             .lang-tags span { padding: 2px 6px; font-size: 11px; }
-
-            .btn-group { gap: 6px; margin-bottom: 15px; }
+            .btn-group { gap: 6px; margin-bottom: 15px; flex-direction: column; }
             .btn, .btn-outline { width: 100%; padding: 10px; font-size: 14px; box-sizing: border-box; text-align: center; }
-
-            .category-bar { 
-                flex-wrap: nowrap; 
-                overflow-x: auto; 
-                justify-content: flex-start; 
-                gap: 5px; 
-                padding-bottom: 10px; 
-                margin-bottom: 15px;
-                -webkit-overflow-scrolling: touch;
-            }
+            .category-bar { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; gap: 5px; padding-bottom: 10px; margin-bottom: 15px; -webkit-overflow-scrolling: touch; }
             .category-bar::-webkit-scrollbar { display: none; }
-            .cat-btn { 
-                flex: 0 0 auto; 
-                padding: 4px 10px; 
-                font-size: 10px; 
-                white-space: nowrap; 
-            }
-
+            .cat-btn { flex: 0 0 auto; padding: 4px 10px; font-size: 10px; white-space: nowrap; }
             .add-form { margin-top: auto; padding-top: 15px; }
             .form-group { flex-direction: row; flex-wrap: wrap; gap: 8px; }
-            .form-group input, .form-group select { 
-                flex: 1 1 40%; 
-                min-width: 70px; 
-                padding: 8px; 
-                font-size: 13px; 
-            }
+            .form-group input, .form-group select { flex: 1 1 40%; min-width: 70px; padding: 8px; font-size: 13px; }
             .form-group button { width: 100%; padding: 10px; font-size: 14px; }
+            .sync-actions { gap: 5px; }
+            .btn-small { padding: 6px 10px; font-size: 12px; }
             .footer-note { font-size: 11px; margin-top: 10px; }
+            
+            /* ✅ ТУГМАИ РЕЖИМ ДАР ТЕЛЕФОН НАМОЁН МЕШАВАД */
+            .mobile-mode-btn {
+                display: flex;
+            }
         }
     </style>
 </head>
@@ -111,6 +111,7 @@
         <div class="btn-group">
             <button class="btn" id="revealAllBtn">Показать все переводы</button>
             <button class="btn btn-outline" id="hideAllBtn">Скрыть все переводы</button>
+            <!-- Ҳоло тугмаи "Скрыть немецкий" -ро ба тугмаи нав иваз мекунем -->
         </div>
 
         <div class="category-bar" id="categoryBar">
@@ -138,22 +139,27 @@
                 </select>
                 <button id="addBtn">Добавить</button>
             </div>
+            
+            <div class="sync-actions">
+                <button class="btn-small" onclick="exportData()">📤 Экспорт</button>
+                <button class="btn-small" onclick="document.getElementById('importInput').click()">📥 Импорт</button>
+            </div>
+            <input type="file" id="importInput" accept=".json" style="display:none;" onchange="importData(event)">
+
             <p style="font-size:13px; color:#888; margin-top:10px; text-align:center;">Калимаҳо дар браузер нигоҳ дошта мешаванд.</p>
         </div>
-        <div class="footer-note">Нажми на размытый перевод, чтобы увидеть его. Нажми 🔊, чтобы услышать произношение.</div>
+        <div class="footer-note">Барои иваз кардани режими омӯзиш, тугмаи кунҷи чапро истифода баред.</div>
     </div>
 
+    <!-- ✅ ТУГМАИ НАВ ДАР КУНҶИ ЧАП (Барои иваз кардани режим) -->
+    <button class="mobile-mode-btn" id="modeToggleBtn">Режим: DE ➔ RU</button>
+
     <script>
-        // ✅ БАРОИ ПИНҲОН КАРДАНИ САТРИ БРАУЗЕР ДАР ТЕЛЕФОН
         window.addEventListener('load', function() {
-            setTimeout(function() {
-                window.scrollTo(0, 1);
-            }, 100);
+            setTimeout(function() { window.scrollTo(0, 1); }, 100);
         });
         window.addEventListener('orientationchange', function() {
-            setTimeout(function() {
-                window.scrollTo(0, 1);
-            }, 200);
+            setTimeout(function() { window.scrollTo(0, 1); }, 200);
         });
 
         let words = [
@@ -168,6 +174,7 @@
         ];
 
         let currentCategory = 'all';
+        let mode = 'normal'; // normal = DE clear, others blur. reverse = DE blur, others clear.
 
         if (localStorage.getItem('savedDeWords')) {
             words = JSON.parse(localStorage.getItem('savedDeWords'));
@@ -198,35 +205,59 @@
             filteredWords.forEach((word, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
+
+                // Логика барои режим
+                let deClasses = 'de-translate';
+                let othersClasses = 'hidden-translate';
+
+                if (mode === 'reverse') {
+                    deClasses += ' de-blur';
+                    othersClasses = ''; // дар режими reverse онҳо равшананд
+                } else {
+                    othersClasses = 'hidden-translate';
+                }
+
                 card.innerHTML = `
                     <div class="word-row">
                         <strong>
-                            ${word.de}
-                            <span class="sound-btn" onclick="speak('${word.de}', 'de-DE')" title="Шунидани талаффузи немисӣ">🔊</span>
+                            <span class="${deClasses}" data-index="${index}" data-lang="de">
+                                ${word.de}
+                                <span class="sound-btn" onclick="speak('${word.de}', 'de-DE')" title="Шунидани талаффузи немисӣ">🔊</span>
+                            </span>
                         </strong>
                         <div class="lang-tags">
                             <span class="en-bg">EN</span>
-                            <span class="hidden-translate" data-index="${index}" data-lang="en">
+                            <span class="${othersClasses}" data-index="${index}" data-lang="en">
                                 ${word.en}
                                 <span class="sound-btn" onclick="speak('${word.en}', 'en-US')" title="Шунидани талаффузи англисӣ" style="margin-left:0; font-size:12px; background:transparent;">🔊</span>
                             </span>
                         </div>
                         <div class="lang-tags">
                             <span class="ru-bg">RU</span>
-                            <span class="hidden-translate" data-index="${index}" data-lang="ru">${word.ru}</span>
+                            <span class="${othersClasses}" data-index="${index}" data-lang="ru">${word.ru}</span>
                         </div>
                         <div class="lang-tags">
                             <span class="tj-bg">TJ</span>
-                            <span class="hidden-translate" data-index="${index}" data-lang="tj">${word.tj}</span>
+                            <span class="${othersClasses}" data-index="${index}" data-lang="tj">${word.tj}</span>
                         </div>
                     </div>
                 `;
                 list.appendChild(card);
             });
 
+            // Клик барои тарҷумаҳои дигар
             document.querySelectorAll('.hidden-translate').forEach(el => {
                 el.addEventListener('click', function() {
                     this.classList.toggle('revealed');
+                });
+            });
+
+            // Клик барои калимаи немисӣ (агар дар режими reverse бошад)
+            document.querySelectorAll('.de-translate').forEach(el => {
+                el.addEventListener('click', function() {
+                    if (mode === 'reverse') {
+                        this.classList.toggle('revealed');
+                    }
                 });
             });
         }
@@ -242,6 +273,20 @@
         document.getElementById('hideAllBtn').addEventListener('click', () => {
             document.querySelectorAll('.hidden-translate').forEach(el => el.classList.remove('revealed'));
         });
+
+        // ✅ ТАҒЙИРОТ: Логикаи тугмаи режим
+        function toggleMode() {
+            const btn = document.getElementById('modeToggleBtn');
+            if (mode === 'normal') {
+                mode = 'reverse';
+                btn.textContent = 'Режим: RU ➔ DE';
+            } else {
+                mode = 'normal';
+                btn.textContent = 'Режим: DE ➔ RU';
+            }
+            renderWords();
+        }
+        document.getElementById('modeToggleBtn').addEventListener('click', toggleMode);
 
         function setCategory(category) {
             currentCategory = category;
@@ -274,6 +319,42 @@
                 alert('Лутфан ҳар чор майдонро пур кунед!');
             }
         });
+
+        function exportData() {
+            const dataStr = JSON.stringify(words, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `deutsch_words_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedWords = JSON.parse(e.target.result);
+                    if (Array.isArray(importedWords)) {
+                        words = importedWords;
+                        saveWords();
+                        renderWords();
+                        alert("✅ Калимаҳо бомуваффақият импорт карда шуданд!");
+                    } else {
+                        alert("❌ Формати файл нодуруст аст!");
+                    }
+                } catch (error) {
+                    alert("❌ Хатогӣ ҳангоми хондани файл!");
+                }
+            };
+            reader.readAsText(file);
+            document.getElementById('importInput').value = '';
+        }
 
         renderWords();
     </script>
