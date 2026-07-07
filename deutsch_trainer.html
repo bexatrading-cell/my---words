@@ -12,11 +12,12 @@
         .word-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; }
         .word-row strong { min-width: 90px; color: #2c3e50; display: flex; align-items: center; gap: 8px; font-size: 18px; }
         
-        .hidden-translate { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #555; font-size: 15px; }
+        /* ✅ ИСЛОҲИ РАНГ: Аз #555 ба #000 (Сиёҳ) иваз карда шуд */
+        .hidden-translate { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #000; font-size: 15px; }
         .hidden-translate:hover { filter: blur(2px); }
         .hidden-translate.revealed { filter: blur(0); color: #000000; font-weight: bold; }
         
-        .de-blur { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #555; font-size: 15px; }
+        .de-blur { filter: blur(4px); cursor: pointer; transition: 0.2s; user-select: none; color: #000; font-size: 15px; }
         .de-blur:hover { filter: blur(2px); }
         .de-blur.revealed { filter: blur(0); color: #000000; font-weight: bold; }
         
@@ -54,9 +55,9 @@
 
         .footer-note { text-align: center; font-size: 13px; color: #7f8c8d; margin-top: 20px; }
 
-        /* ✅ ТУГМАИ РЕЖИМ (ТАНҲО ДАР ТЕЛЕФОН, КУНҶИ ЧАП) */
+        /* ✅ ТУГМАИ РЕЖИМ (ТАНҲО ДАР ТЕЛЕФОН) */
         .mobile-mode-btn {
-            display: none; /* Дар компютер пинҳон аст */
+            display: none;
             position: fixed;
             bottom: 20px;
             left: 20px;
@@ -97,11 +98,7 @@
             .sync-actions { gap: 5px; }
             .btn-small { padding: 6px 10px; font-size: 12px; }
             .footer-note { font-size: 11px; margin-top: 10px; }
-            
-            /* ✅ ТУГМАИ РЕЖИМ ДАР ТЕЛЕФОН НАМОЁН МЕШАВАД */
-            .mobile-mode-btn {
-                display: flex;
-            }
+            .mobile-mode-btn { display: flex; }
         }
     </style>
 </head>
@@ -111,7 +108,6 @@
         <div class="btn-group">
             <button class="btn" id="revealAllBtn">Показать все переводы</button>
             <button class="btn btn-outline" id="hideAllBtn">Скрыть все переводы</button>
-            <!-- Ҳоло тугмаи "Скрыть немецкий" -ро ба тугмаи нав иваз мекунем -->
         </div>
 
         <div class="category-bar" id="categoryBar">
@@ -151,7 +147,6 @@
         <div class="footer-note">Барои иваз кардани режими омӯзиш, тугмаи кунҷи чапро истифода баред.</div>
     </div>
 
-    <!-- ✅ ТУГМАИ НАВ ДАР КУНҶИ ЧАП (Барои иваз кардани режим) -->
     <button class="mobile-mode-btn" id="modeToggleBtn">Режим: DE ➔ RU</button>
 
     <script>
@@ -206,13 +201,12 @@
                 const card = document.createElement('div');
                 card.className = 'card';
 
-                // Логика барои режим
                 let deClasses = 'de-translate';
                 let othersClasses = 'hidden-translate';
 
                 if (mode === 'reverse') {
                     deClasses += ' de-blur';
-                    othersClasses = ''; // дар режими reverse онҳо равшананд
+                    othersClasses = '';
                 } else {
                     othersClasses = 'hidden-translate';
                 }
@@ -245,14 +239,12 @@
                 list.appendChild(card);
             });
 
-            // Клик барои тарҷумаҳои дигар
             document.querySelectorAll('.hidden-translate').forEach(el => {
                 el.addEventListener('click', function() {
                     this.classList.toggle('revealed');
                 });
             });
 
-            // Клик барои калимаи немисӣ (агар дар режими reverse бошад)
             document.querySelectorAll('.de-translate').forEach(el => {
                 el.addEventListener('click', function() {
                     if (mode === 'reverse') {
@@ -274,7 +266,6 @@
             document.querySelectorAll('.hidden-translate').forEach(el => el.classList.remove('revealed'));
         });
 
-        // ✅ ТАҒЙИРОТ: Логикаи тугмаи режим
         function toggleMode() {
             const btn = document.getElementById('modeToggleBtn');
             if (mode === 'normal') {
