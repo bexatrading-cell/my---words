@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ассистент - Немецкий</title>
+    <style>
+        :root {
+            --primary: #48c9b0;
+            --bg: #f2f5f8;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 20px 15px;
+            display: flex;
+            justify-content: center;
+        }
+        .app {
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+        }
+        .header h1 { margin: 0; font-size: 24px; color: #222; }
+        .header-icons { font-size: 22px; color: #444; cursor: pointer; }
+
+        .test-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            position: relative;
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+        .test-card:hover { background: #fafafa; }
+        .test-card .title {
+            font-size: 17px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        .test-stats {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .stat-pill {
+            background: #f0f4f8;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #555;
+            border: 1px solid #e6eaef;
+        }
+        .stat-pill span { opacity: 0.7; margin-right: 4px; }
+
+        #quizScreen, #resultScreen { display: none; }
+        
+        .quiz-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .question-progress {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .option-btn:active { transform: scale(0.98); }
+        .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option-btn.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option-btn:disabled { opacity: 0.6; cursor: default; }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            flex: 1;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: transparent; border: 2px solid #ddd; color: #444; }
+        .btn-fav { flex: 0.5; background: #fff5e6; border: 2px solid #ffcc80; color: #e65100; }
+        .btn-fav.active { background: #fff3e0; border-color: #ff9800; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal {
+            background: white;
+            width: 90%; max-width: 400px;
+            border-radius: 20px;
+            padding: 20px;
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px;
+        }
+        .modal-header h3 { margin: 0; }
+        .close-btn {
+            background: #e0f2f1; border: none; width: 32px; height: 32px;
+            border-radius: 50%; font-size: 18px; cursor: pointer;
+        }
+
+        .action-menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 200;
+        }
+        .action-menu {
+            background: white;
+            width: 100%; max-width: 450px;
+            border-radius: 20px 20px 0 0;
+            padding: 20px 0 30px 0;
+        }
+        .action-item {
+            display: flex; align-items: center;
+            padding: 15px 25px; gap: 15px;
+            font-size: 16px; cursor: pointer;
+            color: #222;
+        }
+        .action-item:active { background: #f5f5f5; }
+        .action-item span { font-size: 20px; width: 24px; text-align: center; color: #555; }
+        
+        .result-box { text-align: center; padding: 20px 0; }
+        .result-score { font-size: 40px; color: var(--primary); font-weight: bold; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="header">
+        <h1>Ассистент</h1>
+        <div class="header-icons">
+            <span onclick="openSettings()">⚙️</span>
+        </div>
+    </div>
+
+    <div id="menuScreen">
+        <div class="test-card" onclick="openActionMenu()">
+            <div class="title">📚 Русско-Немецкий словарь</div>
+            <div class="test-stats">
+                <span class="stat-pill"><span>❓</span> 88</span>
+                <span class="stat-pill" id="favStat"><span>⭐</span> 0</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizScreen">
+        <div class="header">
+            <h1 style="font-size: 20px; cursor: pointer;" onclick="goHome()">← Назад</h1>
+            <span style="font-size: 14px; color: #888;" id="progressHeader">0/0</span>
+        </div>
+        <div class="quiz-card">
+            <div class="question-progress" id="progressText">Вопрос 1 из 88</div>
+            <div class="question-text" id="questionText">Слово</div>
+            <div id="optionsContainer"></div>
+            <div class="action-row">
+                <button class="btn btn-fav" id="favBtn" onclick="toggleFavorite()">⭐ Избранное</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;">Далее →</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultScreen">
+        <div class="header"><h1 style="font-size: 20px; cursor: pointer;" onclick="goHome()">← Назад</h1></div>
+        <div class="quiz-card result-box">
+            <h3>Результат</h3>
+            <div class="result-score" id="scoreText">0 / 0</div>
+            <p id="gradeText" style="color:#666;"></p>
+            <br>
+            <button class="btn btn-primary" onclick="goHome()">В меню</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Настройки</h3>
+                <button class="close-btn" onclick="closeSettings()">✕</button>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; display: block; margin-bottom: 5px;">Режим вопросов</label>
+                <select id="modeSelect" style="width:100%; padding: 10px; border-radius: 8px; border:1px solid #ddd;">
+                    <option value="all">Все вопросы</option>
+                    <option value="favorites">Только избранные</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="shuffleCheck" checked>
+                <label for="shuffleCheck">Перемешать вопросы</label>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="startExam()">Начать экзамен</button>
+        </div>
+    </div>
+
+    <div class="action-menu-overlay" id="actionMenu">
+        <div class="action-menu">
+            <div class="action-item" onclick="startAction('train')">
+                <span>✔️</span> Тренировочный тест
+            </div>
+            <div class="action-item" onclick="startAction('exam')">
+                <span>⚡</span> Экзамен
+            </div>
+            <div class="action-item" onclick="startAction('favorites')">
+                <span>⭐</span> Избранные вопросы
+            </div>
+            <div style="border-top: 1px solid #eee; margin: 10px 0;"></div>
+            <div class="action-item" onclick="closeActionMenu()" style="color: #e74c3c;">
+                <span>✕</span> Закрыть
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- БАЗА ИЗ 88 СЛОВ (Русский -> Немецкий) ---
+    const allWords = [
+        { id: 1, ru: "буква", de: "der Buchstabe", fav: false },
+        { id: 2, ru: "письмо", de: "der Brief", fav: false },
+        { id: 3, ru: "текст", de: "der Text", fav: false },
+        { id: 4, ru: "предложение", de: "der Satz", fav: false },
+        { id: 5, ru: "цифра", de: "die Zahl", fav: false },
+        { id: 6, ru: "группа", de: "die Gruppe", fav: false },
+        { id: 7, ru: "упражнение", de: "die Übung", fav: false },
+        { id: 8, ru: "партнерша", de: "die Partnerin", fav: false },
+        { id: 9, ru: "таблица", de: "die Tabelle", fav: false },
+        { id: 10, ru: "руководитель курса", de: "die Kursleiterin", fav: false },
+        { id: 11, ru: "разговор", de: "das Gespräch", fav: false },
+        { id: 12, ru: "фотография", de: "das Foto", fav: false },
+        { id: 13, ru: "слово", de: "das Wort", fav: false },
+        { id: 14, ru: "картинка", de: "das Bild", fav: false },
+        { id: 15, ru: "Говорите!", de: "Sprechen Sie!", fav: false },
+        { id: 16, ru: "Пишите!", de: "Schreiben Sie!", fav: false },
+        { id: 17, ru: "Читайте!", de: "Lesen Sie!", fav: false },
+        { id: 18, ru: "Слушайте!", de: "Hören Sie!", fav: false },
+        { id: 19, ru: "Работайте вдвоем!", de: "Arbeiten Sie zu zweit!", fav: false },
+        { id: 20, ru: "Работайте в группе!", de: "Arbeiten Sie in der Gruppe!", fav: false },
+        { id: 21, ru: "Спрашивайте и отвечайте!", de: "Fragen und Antworten Sie!", fav: false },
+        { id: 22, ru: "Показывайте!", de: "Zeigen Sie!", fav: false },
+        { id: 23, ru: "Заполните!", de: "Ergänzen Sie!", fav: false },
+        { id: 24, ru: "Поставьте галочку!", de: "Kreuzen Sie an!", fav: false },
+        { id: 25, ru: "Упорядочьте!", de: "Ordnen Sie zu!", fav: false },
+        { id: 26, ru: "Отмечайте!", de: "Markieren Sie!", fav: false },
+        { id: 27, ru: "Рисуйте!", de: "Zeichnen Sie!", fav: false },
+        { id: 28, ru: "Я это не понимаю", de: "Ich verstehe das nicht", fav: false },
+        { id: 29, ru: "Как это пишется?", de: "Wie schreibt man das?", fav: false },
+        { id: 30, ru: "Как это называется?", de: "Was heißt das?", fav: false },
+        { id: 31, ru: "Как это произносится?", de: "Wie spricht man das aus?", fav: false },
+        { id: 32, ru: "Что мы должны делать?", de: "Was sollen wir tun?", fav: false },
+        { id: 33, ru: "Пожалуйста, помогите мне", de: "Helfen Sie mir bitte", fav: false },
+        { id: 34, ru: "приходить", de: "kommen", fav: false },
+        { id: 35, ru: "называться", de: "heißen", fav: false },
+        { id: 36, ru: "Как дела?", de: "Wie geht's?", fav: false },
+        { id: 37, ru: "Как у тебя дела?", de: "Wie geht es dir?", fav: false },
+        { id: 38, ru: "Как у вас дела?", de: "Wie geht es Ihnen?", fav: false },
+        { id: 39, ru: "сравнивать", de: "vergleichen", fav: false },
+        { id: 40, ru: "до свидания", de: "auf Wiedersehen", fav: false },
+        { id: 41, ru: "день", de: "der Tag", fav: false },
+        { id: 42, ru: "добрый день", de: "Guten Tag", fav: false },
+        { id: 43, ru: "доброе утро", de: "Guten Morgen", fav: false },
+        { id: 44, ru: "добрый вечер", de: "Guten Abend", fav: false },
+        { id: 45, ru: "спокойной ночи", de: "Gute Nacht", fav: false },
+        { id: 46, ru: "очень хорошо", de: "sehr gut", fav: false },
+        { id: 47, ru: "хорошо", de: "gut", fav: false },
+        { id: 48, ru: "нормально", de: "es geht", fav: false },
+        { id: 49, ru: "не очень хорошо", de: "nicht so gut", fav: false },
+        { id: 50, ru: "плохо", de: "schlecht", fav: false },
+        { id: 51, ru: "спасибо", de: "danke", fav: false },
+        { id: 52, ru: "пока", de: "tschüss", fav: false },
+        { id: 53, ru: "выражение", de: "die Wendung", fav: false },
+        { id: 54, ru: "упражняться", de: "üben", fav: false },
+        { id: 55, ru: "дальше", de: "weiter", fav: false },
+        { id: 56, ru: "личность", de: "die Persönlichkeit", fav: false },
+        { id: 57, ru: "на", de: "auf", fav: false },
+        { id: 58, ru: "из", de: "aus", fav: false },
+        { id: 59, ru: "приветствие", de: "die Begrüßung", fav: false },
+        { id: 60, ru: "прощание", de: "der Abschied", fav: false },
+        { id: 61, ru: "попрощайтесь в конце урока", de: "Verabschieden Sie sich am Ende der Stunde", fav: false },
+        { id: 62, ru: "коммуникация", de: "die Kommunikation", fav: false },
+        { id: 63, ru: "Как вас зовут? Как тебя зовут?", de: "Wie heißen Sie? Wie heißt du?", fav: false },
+        { id: 64, ru: "Вы кто? Ты кто?", de: "Wer sind Sie? Wer bist du?", fav: false },
+        { id: 65, ru: "Меня зовут Николь", de: "Ich heiße Nicole", fav: false },
+        { id: 66, ru: "Меня зовут Пако", de: "Mein Name ist Paco", fav: false },
+        { id: 67, ru: "происхождение", de: "die Herkunft", fav: false },
+        { id: 68, ru: "Вы откуда?", de: "Woher kommen Sie?", fav: false },
+        { id: 69, ru: "Ты откуда?", de: "Woher kommst du?", fav: false },
+        { id: 70, ru: "Я из Таджикистана", de: "Ich komme aus Tadschikistan", fav: false },
+        { id: 71, ru: "представить себя и других", de: "Sich und andere vorstellen", fav: false },
+        { id: 72, ru: "спросить о состоянии", de: "Nach dem Befinden fragen", fav: false },
+        { id: 73, ru: "вместе", de: "zusammen", fav: false },
+        { id: 74, ru: "другие", de: "andere", fav: false },
+        { id: 75, ru: "Страны", de: "Länder", fav: false },
+        { id: 76, ru: "Германия", de: "Deutschland", fav: false },
+        { id: 77, ru: "Франция", de: "Frankreich", fav: false },
+        { id: 78, ru: "Австрия", de: "Österreich", fav: false },
+        { id: 79, ru: "Швейцария", de: "die Schweiz", fav: false },
+        { id: 80, ru: "Турция", de: "die Türkei", fav: false },
+        { id: 81, ru: "Вопросы с W", de: "W-Fragen", fav: false },
+        { id: 82, ru: "Что?", de: "Was?", fav: false },
+        { id: 83, ru: "Где?", de: "Wo?", fav: false },
+        { id: 84, ru: "Кто?", de: "Wer?", fav: false },
+        { id: 85, ru: "Откуда?", de: "Woher?", fav: false },
+        { id: 86, ru: "Почему?", de: "Warum?", fav: false },
+        { id: 87, ru: "Как часто?", de: "Wie oft?", fav: false },
+        { id: 88, ru: "Как?", de: "Wie?", fav: false }
+    ];
+
+    // --- ПЕРЕМЕННЫЕ ---
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    // --- ФУНКЦИИ МЕНЮ ---
+    function updateFavBadge() {
+        const count = allWords.filter(w => w.fav).length;
+        document.getElementById('favStat').innerHTML = `<span>⭐</span> ${count}`;
+    }
+
+    function openActionMenu() { document.getElementById('actionMenu').style.display = 'flex'; }
+    function closeActionMenu() { document.getElementById('actionMenu').style.display = 'none'; }
+    function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
+    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+
+    function goHome() {
+        document.getElementById('menuScreen').style.display = 'block';
+        document.getElementById('quizScreen').style.display = 'none';
+        document.getElementById('resultScreen').style.display = 'none';
+        updateFavBadge();
+    }
+
+    // --- ЗАПУСК ---
+    function startAction(type) {
+        closeActionMenu();
+        let pool = [];
+        if (type === 'favorites') {
+            pool = allWords.filter(w => w.fav);
+            if (pool.length === 0) { alert("Нет избранных слов."); return; }
+        } else {
+            pool = [...allWords];
+        }
+        startGame(pool, type);
+    }
+
+    function startExam() {
+        const mode = document.getElementById('modeSelect').value;
+        const shuffle = document.getElementById('shuffleCheck').checked;
+        closeSettings();
+
+        let pool = [];
+        if (mode === 'favorites') {
+            pool = allWords.filter(w => w.fav);
+            if (pool.length === 0) { alert("Нет избранных!"); return; }
+        } else {
+            pool = [...allWords];
+        }
+        startGame(pool, 'exam', shuffle);
+    }
+
+    function startGame(pool, type, shuffle = true) {
+        currentQuestions = shuffle ? pool.sort(() => Math.random() - 0.5) : pool;
+        currentIndex = 0;
+        score = 0;
+
+        document.getElementById('menuScreen').style.display = 'none';
+        document.getElementById('resultScreen').style.display = 'none';
+        document.getElementById('quizScreen').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'none';
+        renderQuestion();
+    }
+
+    // --- ОТРИСОВКА ВОПРОСА (РУССКИЙ ВОПРОС -> НЕМЕЦКИЕ ОТВЕТЫ) ---
+    function renderQuestion() {
+        if (currentIndex >= currentQuestions.length) {
+            showResult();
+            return;
+        }
+
+        const q = currentQuestions[currentIndex];
+        document.getElementById('progressHeader').innerText = `${currentIndex+1}/${currentQuestions.length}`;
+        document.getElementById('progressText').innerText = `Вопрос ${currentIndex + 1} из ${currentQuestions.length}`;
+        document.getElementById('questionText').innerText = q.ru; // Показываем русское слово
+        document.getElementById('nextBtn').style.display = 'none';
+
+        const favBtn = document.getElementById('favBtn');
+        favBtn.innerText = q.fav ? '⭐ В избранном' : '⭐ Избранное';
+        favBtn.className = q.fav ? 'btn btn-fav active' : 'btn btn-fav';
+
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = '';
+
+        // 1 правильный НЕМЕЦКИЙ ответ + 3 случайных НЕМЕЦКИХ неправильных
+        let options = [q.de];
+        let wrongOptions = allWords.filter(w => w.de !== q.de).sort(() => Math.random() - 0.5).slice(0, 3);
+        options = options.concat(wrongOptions.map(w => w.de)); // Берем немецкие варианты (w.de)
+        options = options.sort(() => Math.random() - 0.5);
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt; // Выводим немецкие слова
+            btn.onclick = () => checkAnswer(opt, btn, q.de);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btnElement, correctAnswer) {
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(btn => btn.disabled = true);
+
+        if (selected === correctAnswer) {
+            btnElement.classList.add('correct');
+            score++;
+        } else {
+            btnElement.classList.add('wrong');
+            allBtns.forEach(btn => { if(btn.innerText === correctAnswer) btn.classList.add('correct'); });
+        }
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        renderQuestion();
+    }
+
+    function toggleFavorite() {
+        const q = currentQuestions[currentIndex];
+        q.fav = !q.fav;
+        const original = allWords.find(w => w.id === q.id);
+        if(original) original.fav = q.fav;
+        renderQuestion();
+        updateFavBadge();
+    }
+
+    function showResult() {
+        document.getElementById('quizScreen').style.display = 'none';
+        document.getElementById('resultScreen').style.display = 'block';
+        document.getElementById('scoreText').innerText = `${score} / ${currentQuestions.length}`;
+        let grade = score === currentQuestions.length ? '🎉 Идеально!' : (score >= 60 ? '👍 Хорошо!' : '📖 Повтори!');
+        document.getElementById('gradeText').innerText = grade;
+    }
+
+    updateFavBadge();
+</script>
+
+</body>
+</html>
