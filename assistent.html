@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ассистент - Немецкий</title>
+    <title>Ассистент - Немецкий по Юнитам</title>
     <style>
         :root {
             --primary: #48c9b0;
@@ -32,27 +32,25 @@
         .header h1 { margin: 0; font-size: 24px; color: #222; }
         .header-icons { font-size: 22px; color: #444; cursor: pointer; }
 
-        .test-card {
+        /* Карточка юнита */
+        .unit-card {
             background: white;
             border-radius: 16px;
             padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            position: relative;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #eef2f6;
             cursor: pointer;
-            border: 1px solid #eee;
+            transition: 0.2s;
         }
-        .test-card:hover { background: #fafafa; }
-        .test-card .title {
+        .unit-card:hover { transform: translateY(-2px); }
+        .unit-card .title {
             font-size: 17px;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 12px;
+            color: #2c3e50;
         }
-        .test-stats {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .unit-stats { display: flex; gap: 8px; flex-wrap: wrap; }
         .stat-pill {
             background: #f0f4f8;
             padding: 4px 10px;
@@ -61,15 +59,13 @@
             color: #555;
             border: 1px solid #e6eaef;
         }
-        .stat-pill span { opacity: 0.7; margin-right: 4px; }
-
-        #quizScreen, #resultScreen { display: none; }
         
+        #quizScreen, #resultScreen { display: none; }
         .quiz-card {
             background: white;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .question-progress {
             color: #888;
@@ -81,8 +77,6 @@
             font-weight: 500;
             margin-bottom: 20px;
         }
-        
-        /* Кнопки для теста с выбором */
         .option-btn {
             display: block;
             width: 100%;
@@ -94,25 +88,18 @@
             font-size: 16px;
             text-align: left;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .option-btn:active { transform: scale(0.98); }
         .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; }
         .option-btn.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
         .option-btn:disabled { opacity: 0.6; cursor: default; }
 
-        /* Стили для режима "Написать самому" (Шрайбен) */
-        #writeMode {
-            display: none;
-            text-align: center;
-        }
+        #writeMode { display: none; text-align: center; }
         .write-input {
             width: 100%;
             padding: 15px;
             font-size: 20px;
             border: 2px solid #ddd;
             border-radius: 12px;
-            margin-top: 10px;
             margin-bottom: 15px;
             outline: none;
         }
@@ -144,11 +131,10 @@
             flex: 1;
         }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: transparent; border: 2px solid #ddd; color: #444; }
         .btn-fav { flex: 0.5; background: #fff5e6; border: 2px solid #ffcc80; color: #e65100; }
         .btn-fav.active { background: #fff3e0; border-color: #ff9800; }
         
-        /* Модальное окно продолжения */
+        /* Модальные окна */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5);
@@ -181,6 +167,7 @@
             width: 100%; max-width: 450px;
             border-radius: 20px 20px 0 0;
             padding: 20px 0 30px 0;
+            text-align: left;
         }
         .action-item {
             display: flex; align-items: center;
@@ -206,13 +193,7 @@
     </div>
 
     <div id="menuScreen">
-        <div class="test-card" onclick="openActionMenu()">
-            <div class="title">📚 Русско-Немецкий словарь</div>
-            <div class="test-stats">
-                <span class="stat-pill"><span>❓</span> 88</span>
-                <span class="stat-pill" id="favStat"><span>⭐</span> 0</span>
-            </div>
-        </div>
+        <div id="categoryList"></div>
     </div>
 
     <div id="quizScreen">
@@ -221,13 +202,11 @@
             <span style="font-size: 14px; color: #888;" id="progressHeader">0/0</span>
         </div>
         <div class="quiz-card">
-            <div class="question-progress" id="progressText">Вопрос 1 из 88</div>
+            <div class="question-progress" id="progressText">Вопрос 1</div>
             <div class="question-text" id="questionText">Слово</div>
             
-            <!-- Блок для теста с выбором -->
             <div id="optionsContainer"></div>
             
-            <!-- Блок для режима "Шрайбен" (Правописание) -->
             <div id="writeMode">
                 <p style="font-size: 14px; color: #888; margin-bottom: 5px;">Напиши перевод на немецком:</p>
                 <input type="text" class="write-input" id="writeInput" placeholder="Введите слово..." autocomplete="off" spellcheck="false">
@@ -253,11 +232,11 @@
         </div>
     </div>
 
-    <!-- Модальное окно: Продолжить или начать заново -->
+    <!-- Модальное окно продолжения -->
     <div class="modal-overlay" id="resumeModal">
         <div class="modal">
             <h3>⏳ Прогресс найден!</h3>
-            <p style="color:#666;">Ты не закончил предыдущий тест. Хочешь продолжить с места остановки?</p>
+            <p style="color:#666;">У тебя есть сохраненный прогресс. Продолжить?</p>
             <div class="btn-row">
                 <button class="btn-half" style="background: #f1f2f6; color: #333;" onclick="declineResume()">Начать заново</button>
                 <button class="btn-half" style="background: var(--primary); color: white;" onclick="acceptResume()">Продолжить</button>
@@ -265,39 +244,31 @@
         </div>
     </div>
 
+    <!-- Модальное окно настроек -->
     <div class="modal-overlay" id="settingsModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Настройки</h3>
-                <button class="close-btn" onclick="closeSettings()">✕</button>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label style="font-weight: bold; display: block; margin-bottom: 5px;">Режим вопросов</label>
-                <select id="modeSelect" style="width:100%; padding: 10px; border-radius: 8px; border:1px solid #ddd;">
-                    <option value="all">Все вопросы</option>
-                    <option value="favorites">Только избранные</option>
-                </select>
+        <div class="modal" style="text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0;">Настройки</h3>
+                <button class="btn-half" style="background:#e0f2f1; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer;" onclick="closeSettings()">✕</button>
             </div>
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
                 <input type="checkbox" id="shuffleCheck" checked>
                 <label for="shuffleCheck">Перемешать вопросы</label>
             </div>
-            <button class="btn btn-primary" style="width:100%;" onclick="startExam()">Начать экзамен</button>
+            <button class="btn btn-primary" style="width:100%;" onclick="startFromSettings()">Сохранить</button>
         </div>
     </div>
 
+    <!-- Выплывающее меню -->
     <div class="action-menu-overlay" id="actionMenu">
         <div class="action-menu">
-            <div class="action-item" onclick="startAction('train')">
+            <div class="action-item" onclick="startUnit('train')">
                 <span>✔️</span> Тренировочный тест (выбор)
             </div>
-            <div class="action-item" onclick="startAction('exam')">
+            <div class="action-item" onclick="startUnit('exam')">
                 <span>⚡</span> Экзамен (выбор)
             </div>
-            <div class="action-item" onclick="startAction('favorites')">
-                <span>⭐</span> Избранные вопросы
-            </div>
-            <div class="action-item" onclick="startAction('schreiben')">
+            <div class="action-item" onclick="startUnit('schreiben')">
                 <span>✍️</span> Правописание (Шрайбен)
             </div>
             <div style="border-top: 1px solid #eee; margin: 10px 0;"></div>
@@ -309,182 +280,271 @@
 </div>
 
 <script>
-    // --- БАЗА ИЗ 88 СЛОВ ---
-    const allWords = [
-        { id: 1, ru: "буква", de: "der Buchstabe", fav: false },
-        { id: 2, ru: "письмо", de: "der Brief", fav: false },
-        { id: 3, ru: "текст", de: "der Text", fav: false },
-        { id: 4, ru: "предложение", de: "der Satz", fav: false },
-        { id: 5, ru: "цифра", de: "die Zahl", fav: false },
-        { id: 6, ru: "группа", de: "die Gruppe", fav: false },
-        { id: 7, ru: "упражнение", de: "die Übung", fav: false },
-        { id: 8, ru: "партнерша", de: "die Partnerin", fav: false },
-        { id: 9, ru: "таблица", de: "die Tabelle", fav: false },
-        { id: 10, ru: "руководитель курса", de: "die Kursleiterin", fav: false },
-        { id: 11, ru: "разговор", de: "das Gespräch", fav: false },
-        { id: 12, ru: "фотография", de: "das Foto", fav: false },
-        { id: 13, ru: "слово", de: "das Wort", fav: false },
-        { id: 14, ru: "картинка", de: "das Bild", fav: false },
-        { id: 15, ru: "Говорите!", de: "Sprechen Sie!", fav: false },
-        { id: 16, ru: "Пишите!", de: "Schreiben Sie!", fav: false },
-        { id: 17, ru: "Читайте!", de: "Lesen Sie!", fav: false },
-        { id: 18, ru: "Слушайте!", de: "Hören Sie!", fav: false },
-        { id: 19, ru: "Работайте вдвоем!", de: "Arbeiten Sie zu zweit!", fav: false },
-        { id: 20, ru: "Работайте в группе!", de: "Arbeiten Sie in der Gruppe!", fav: false },
-        { id: 21, ru: "Спрашивайте и отвечайте!", de: "Fragen und Antworten Sie!", fav: false },
-        { id: 22, ru: "Показывайте!", de: "Zeigen Sie!", fav: false },
-        { id: 23, ru: "Заполните!", de: "Ergänzen Sie!", fav: false },
-        { id: 24, ru: "Поставьте галочку!", de: "Kreuzen Sie an!", fav: false },
-        { id: 25, ru: "Упорядочьте!", de: "Ordnen Sie zu!", fav: false },
-        { id: 26, ru: "Отмечайте!", de: "Markieren Sie!", fav: false },
-        { id: 27, ru: "Рисуйте!", de: "Zeichnen Sie!", fav: false },
-        { id: 28, ru: "Я это не понимаю", de: "Ich verstehe das nicht", fav: false },
-        { id: 29, ru: "Как это пишется?", de: "Wie schreibt man das?", fav: false },
-        { id: 30, ru: "Как это называется?", de: "Was heißt das?", fav: false },
-        { id: 31, ru: "Как это произносится?", de: "Wie spricht man das aus?", fav: false },
-        { id: 32, ru: "Что мы должны делать?", de: "Was sollen wir tun?", fav: false },
-        { id: 33, ru: "Пожалуйста, помогите мне", de: "Helfen Sie mir bitte", fav: false },
-        { id: 34, ru: "приходить", de: "kommen", fav: false },
-        { id: 35, ru: "называться", de: "heißen", fav: false },
-        { id: 36, ru: "Как дела?", de: "Wie geht's?", fav: false },
-        { id: 37, ru: "Как у тебя дела?", de: "Wie geht es dir?", fav: false },
-        { id: 38, ru: "Как у вас дела?", de: "Wie geht es Ihnen?", fav: false },
-        { id: 39, ru: "сравнивать", de: "vergleichen", fav: false },
-        { id: 40, ru: "до свидания", de: "auf Wiedersehen", fav: false },
-        { id: 41, ru: "день", de: "der Tag", fav: false },
-        { id: 42, ru: "добрый день", de: "Guten Tag", fav: false },
-        { id: 43, ru: "доброе утро", de: "Guten Morgen", fav: false },
-        { id: 44, ru: "добрый вечер", de: "Guten Abend", fav: false },
-        { id: 45, ru: "спокойной ночи", de: "Gute Nacht", fav: false },
-        { id: 46, ru: "очень хорошо", de: "sehr gut", fav: false },
-        { id: 47, ru: "хорошо", de: "gut", fav: false },
-        { id: 48, ru: "нормально", de: "es geht", fav: false },
-        { id: 49, ru: "не очень хорошо", de: "nicht so gut", fav: false },
-        { id: 50, ru: "плохо", de: "schlecht", fav: false },
-        { id: 51, ru: "спасибо", de: "danke", fav: false },
-        { id: 52, ru: "пока", de: "tschüss", fav: false },
-        { id: 53, ru: "выражение", de: "die Wendung", fav: false },
-        { id: 54, ru: "упражняться", de: "üben", fav: false },
-        { id: 55, ru: "дальше", de: "weiter", fav: false },
-        { id: 56, ru: "личность", de: "die Persönlichkeit", fav: false },
-        { id: 57, ru: "на", de: "auf", fav: false },
-        { id: 58, ru: "из", de: "aus", fav: false },
-        { id: 59, ru: "приветствие", de: "die Begrüßung", fav: false },
-        { id: 60, ru: "прощание", de: "der Abschied", fav: false },
-        { id: 61, ru: "попрощайтесь в конце урока", de: "Verabschieden Sie sich am Ende der Stunde", fav: false },
-        { id: 62, ru: "коммуникация", de: "die Kommunikation", fav: false },
-        { id: 63, ru: "Как вас зовут? Как тебя зовут?", de: "Wie heißen Sie? Wie heißt du?", fav: false },
-        { id: 64, ru: "Вы кто? Ты кто?", de: "Wer sind Sie? Wer bist du?", fav: false },
-        { id: 65, ru: "Меня зовут Николь", de: "Ich heiße Nicole", fav: false },
-        { id: 66, ru: "Меня зовут Пако", de: "Mein Name ist Paco", fav: false },
-        { id: 67, ru: "происхождение", de: "die Herkunft", fav: false },
-        { id: 68, ru: "Вы откуда?", de: "Woher kommen Sie?", fav: false },
-        { id: 69, ru: "Ты откуда?", de: "Woher kommst du?", fav: false },
-        { id: 70, ru: "Я из Таджикистана", de: "Ich komme aus Tadschikistan", fav: false },
-        { id: 71, ru: "представить себя и других", de: "Sich und andere vorstellen", fav: false },
-        { id: 72, ru: "спросить о состоянии", de: "Nach dem Befinden fragen", fav: false },
-        { id: 73, ru: "вместе", de: "zusammen", fav: false },
-        { id: 74, ru: "другие", de: "andere", fav: false },
-        { id: 75, ru: "Страны", de: "Länder", fav: false },
-        { id: 76, ru: "Германия", de: "Deutschland", fav: false },
-        { id: 77, ru: "Франция", de: "Frankreich", fav: false },
-        { id: 78, ru: "Австрия", de: "Österreich", fav: false },
-        { id: 79, ru: "Швейцария", de: "die Schweiz", fav: false },
-        { id: 80, ru: "Турция", de: "die Türkei", fav: false },
-        { id: 81, ru: "Вопросы с W", de: "W-Fragen", fav: false },
-        { id: 82, ru: "Что?", de: "Was?", fav: false },
-        { id: 83, ru: "Где?", de: "Wo?", fav: false },
-        { id: 84, ru: "Кто?", de: "Wer?", fav: false },
-        { id: 85, ru: "Откуда?", de: "Woher?", fav: false },
-        { id: 86, ru: "Почему?", de: "Warum?", fav: false },
-        { id: 87, ru: "Как часто?", de: "Wie oft?", fav: false },
-        { id: 88, ru: "Как?", de: "Wie?", fav: false }
+    // --- ЮНИТ 1 (Все слова из первой лекции Lektion 1) ---
+    // --- ЮНИТ 2 (Все слова из второй лекции Lektion 2) ---
+    const categories = [
+        { 
+            id: 'unit1', 
+            title: '📖 Юнит 1 (Lektion 1)', 
+            words: [
+                { de: "der Tisch", ru: "стол" },
+                { de: "der Stuhl", ru: "стул" },
+                { de: "der Stift", ru: "карандаш/ручка" },
+                { de: "der Computer", ru: "компьютер" },
+                { de: "der Wagen", ru: "машина" },
+                { de: "der Mensch", ru: "человек" },
+                { de: "die Lampe", ru: "лампа" },
+                { de: "die Tasche", ru: "сумка" },
+                { de: "die Blume", ru: "цветок" },
+                { de: "die Vase", ru: "ваза" },
+                { de: "die Straße", ru: "улица" },
+                { de: "die Übung", ru: "упражнение" },
+                { de: "die Zeitung", ru: "газета" },
+                { de: "die Zeitschrift", ru: "журнал" },
+                { de: "das Buch", ru: "книга" },
+                { de: "das Bild", ru: "картина" },
+                { de: "das Wort", ru: "слово" },
+                { de: "das Haus", ru: "дом" },
+                { de: "das Zimmer", ru: "комната" },
+                { de: "das Kind", ru: "ребенок" },
+                { de: "das Mädchen", ru: "девочка" },
+                { de: "das Spielzeug", ru: "игрушка" },
+                { de: "der Buchstabe", ru: "буква" },
+                { de: "der Brief", ru: "письмо" },
+                { de: "der Text", ru: "текст" },
+                { de: "der Satz", ru: "предложение" },
+                { de: "die Zahl", ru: "цифра" },
+                { de: "die Gruppe", ru: "группа" },
+                { de: "die Übung", ru: "упражнение" },
+                { de: "die Partnerin", ru: "партнерша" },
+                { de: "die Tabelle", ru: "таблица" },
+                { de: "die Kursleiterin", ru: "руководитель курса" },
+                { de: "das Gespräch", ru: "разговор" },
+                { de: "das Foto", ru: "фотография" },
+                { de: "das Wort", ru: "слово" },
+                { de: "das Bild", ru: "картинка" },
+                { de: "Sprechen Sie!", ru: "Говорите!" },
+                { de: "Schreiben Sie!", ru: "Пишите!" },
+                { de: "Lesen Sie!", ru: "Читайте!" },
+                { de: "Hören Sie!", ru: "Слушайте!" },
+                { de: "Arbeiten Sie zu zweit!", ru: "Работайте вдвоем!" },
+                { de: "Arbeiten Sie in der Gruppe!", ru: "Работайте в группе!" },
+                { de: "Fragen und Antworten Sie!", ru: "Спрашивайте и отвечайте!" },
+                { de: "Zeigen Sie!", ru: "Показывайте!" },
+                { de: "Ergänzen Sie!", ru: "Заполните!" },
+                { de: "Kreuzen Sie an!", ru: "Поставьте галочку!" },
+                { de: "Ordnen Sie zu!", ru: "Упорядочьте!" },
+                { de: "Markieren Sie!", ru: "Отмечайте!" },
+                { de: "Zeichnen Sie!", ru: "Рисуйте!" },
+                { de: "Ich verstehe das nicht", ru: "Я это не понимаю" },
+                { de: "Wie schreibt man das?", ru: "Как это пишется?" },
+                { de: "Was heißt das?", ru: "Как это называется?" },
+                { de: "Wie spricht man das aus?", ru: "Как это произносится?" },
+                { de: "Was sollen wir tun?", ru: "Что мы должны делать?" },
+                { de: "Helfen Sie mir bitte", ru: "Пожалуйста, помогите мне" },
+                { de: "kommen", ru: "приходить" },
+                { de: "heißen", ru: "называться" },
+                { de: "Wie geht's?", ru: "Как дела?" },
+                { de: "Wie geht es dir?", ru: "Как у тебя дела?" },
+                { de: "Wie geht es Ihnen?", ru: "Как у вас дела?" },
+                { de: "vergleichen", ru: "сравнивать" },
+                { de: "auf Wiedersehen", ru: "до свидания" },
+                { de: "der Tag", ru: "день" },
+                { de: "Guten Tag", ru: "добрый день" },
+                { de: "Guten Morgen", ru: "доброе утро" },
+                { de: "Guten Abend", ru: "добрый вечер" },
+                { de: "Gute Nacht", ru: "спокойной ночи" },
+                { de: "sehr gut", ru: "очень хорошо" },
+                { de: "gut", ru: "хорошо" },
+                { de: "es geht", ru: "нормально" },
+                { de: "nicht so gut", ru: "не очень хорошо" },
+                { de: "schlecht", ru: "плохо" },
+                { de: "danke", ru: "спасибо" },
+                { de: "tschüss", ru: "пока" },
+                { de: "die Wendung", ru: "выражение" },
+                { de: "üben", ru: "упражняться" },
+                { de: "weiter", ru: "дальше" },
+                { de: "die Persönlichkeit", ru: "личность" },
+                { de: "auf", ru: "на" },
+                { de: "aus", ru: "из" },
+                { de: "die Begrüßung", ru: "приветствие" },
+                { de: "der Abschied", ru: "прощание" },
+                { de: "Verabschieden Sie sich am Ende der Stunde", ru: "попрощайтесь в конце урока" },
+                { de: "die Kommunikation", ru: "коммуникация" },
+                { de: "Wie heißen Sie? Wie heißt du?", ru: "Как вас зовут? Как тебя зовут?" },
+                { de: "Wer sind Sie? Wer bist du?", ru: "Вы кто? Ты кто?" },
+                { de: "Ich heiße Nicole", ru: "Меня зовут Николь" },
+                { de: "Mein Name ist Paco", ru: "Меня зовут Пако" },
+                { de: "die Herkunft", ru: "происхождение" },
+                { de: "Woher kommen Sie?", ru: "Вы откуда?" },
+                { de: "Woher kommst du?", ru: "Ты откуда?" },
+                { de: "Ich komme aus Tadschikistan", ru: "Я из Таджикистана" },
+                { de: "Sich und andere vorstellen", ru: "представить себя и других" },
+                { de: "Nach dem Befinden fragen", ru: "спросить о состоянии" },
+                { de: "zusammen", ru: "вместе" },
+                { de: "andere", ru: "другие" },
+                { de: "Länder", ru: "Страны" },
+                { de: "Deutschland", ru: "Германия" },
+                { de: "Frankreich", ru: "Франция" },
+                { de: "Österreich", ru: "Австрия" },
+                { de: "die Schweiz", ru: "Швейцария" },
+                { de: "die Türkei", ru: "Турция" },
+                { de: "W-Fragen", ru: "Вопросы с W" },
+                { de: "Was?", ru: "Что?" },
+                { de: "Wo?", ru: "Где?" },
+                { de: "Wer?", ru: "Кто?" },
+                { de: "Woher?", ru: "Откуда?" },
+                { de: "Warum?", ru: "Почему?" },
+                { de: "Wie oft?", ru: "Как часто?" },
+                { de: "Wie?", ru: "Как?" },
+            ]
+        },
+        { 
+            id: 'unit2', 
+            title: '📖 Юнит 2 (Lektion 2)', 
+            words: [
+                { de: "der Arbeitgeber", ru: "работодатель" },
+                { de: "die Ausbildung", ru: "образование" },
+                { de: "der Beruf", ru: "профессия" },
+                { de: "die Hochschule", ru: "вуз" },
+                { de: "die Universität", ru: "университет" },
+                { de: "der Job", ru: "работа" },
+                { de: "das Praktikum", ru: "практика" },
+                { de: "die Schule", ru: "школа" },
+                { de: "die Stelle", ru: "место работы" },
+                { de: "arbeiten", ru: "работать" },
+                { de: "studieren", ru: "учиться" },
+                { de: "arbeitslos", ru: "безработный" },
+                { de: "von Beruf", ru: "по профессии" },
+                { de: "Was ...?", ru: "Что ...?" },
+
+                { de: "der Architekt", ru: "архитектор" },
+                { de: "der Arzt", ru: "врач" },
+                { de: "der Friseur", ru: "парикмахер" },
+                { de: "der Coiffeur", ru: "стилист" },
+                { de: "der Ingenieur", ru: "инженер" },
+                { de: "der Journalist", ru: "журналист" },
+                { de: "der Kellner", ru: "официант" },
+                { de: "die Krankenschwester", ru: "медсестра" },
+                { de: "der Lehrer", ru: "учитель" },
+                { de: "der Mechatroniker", ru: "мехатроник" },
+                { de: "der Student", ru: "студент" },
+                { de: "der Schauspieler", ru: "актер" },
+                { de: "der Schüler", ru: "ученик" },
+                { de: "der Sekretär", ru: "секретарь" },
+                { de: "der Verkäufer", ru: "продавец" },
+
+                { de: "das Alter", ru: "возраст" },
+                { de: "der Familienstand", ru: "семейное положение" },
+                { de: "der Zivilstand", ru: "семейное положение" },
+                { de: "das Jahr", ru: "год" },
+                { de: "... Jahre alt sein", ru: "быть ... лет" },
+                { de: "das Kind", ru: "ребенок" },
+                { de: "leben", ru: "жить" },
+                { de: "allein leben", ru: "жить одному" },
+                { de: "zusammenleben", ru: "жить вместе" },
+                { de: "wohnen", ru: "проживать" },
+                { de: "geschieden", ru: "разведен(а)" },
+                { de: "verheiratet", ru: "женат/замужем" },
+                { de: "in", ru: "в" },
+                { de: "Wo ...?", ru: "Где ...?" },
+
+                { de: "glauben", ru: "верить" },
+                { de: "haben", ru: "иметь" },
+                { de: "machen", ru: "делать" },
+                { de: "richtig", ru: "правильно" },
+                { de: "falsch", ru: "неправильно" },
+                { de: "super", ru: "супер" },
+                { de: "aber", ru: "но" },
+                { de: "kein", ru: "никакой" },
+                { de: "nicht", ru: "не" },
+            ]
+        }
     ];
 
-    // --- ПЕРЕМЕННЫЕ ---
+    // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+    let allWords = [];
+    let currentUnitId = null;
     let currentQuestions = [];
     let currentIndex = 0;
     let score = 0;
     let currentMode = 'train';
     let isResuming = false;
 
-    // --- ФУНКЦИИ МЕНЮ ---
-    function updateFavBadge() {
-        const count = allWords.filter(w => w.fav).length;
-        document.getElementById('favStat').innerHTML = `<span>⭐</span> ${count}`;
+    function loadFavorites() {
+        const favData = localStorage.getItem('assistentFavorites');
+        if (favData) return JSON.parse(favData);
+        return [];
+    }
+    function saveFavorites(favList) {
+        localStorage.setItem('assistentFavorites', JSON.stringify(favList));
     }
 
-    function openActionMenu() { document.getElementById('actionMenu').style.display = 'flex'; }
-    function closeActionMenu() { document.getElementById('actionMenu').style.display = 'none'; }
-    function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
-    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-
-    function goHome() {
-        document.getElementById('menuScreen').style.display = 'block';
-        document.getElementById('quizScreen').style.display = 'none';
-        document.getElementById('resultScreen').style.display = 'none';
-        // Если пользователь вышел, сбрасываем флаг, чтобы при следующем входе выскочило окно
-        localStorage.removeItem('activeSession'); 
-        updateFavBadge();
+    function renderMenu() {
+        const list = document.getElementById('categoryList');
+        list.innerHTML = '';
+        categories.forEach(cat => {
+            const card = document.createElement('div');
+            card.className = 'unit-card';
+            card.innerHTML = `
+                <div class="title">${cat.title}</div>
+                <div class="unit-stats">
+                    <span class="stat-pill">❓ ${cat.words.length}</span>
+                </div>
+            `;
+            card.onclick = () => { openUnitMenu(cat.id); };
+            list.appendChild(card);
+        });
     }
 
-    // --- ФУНКЦИЯ ЗАПУСКА ТЕСТА С ПРОВЕРКОЙ СОХРАНЕНИЯ ---
-    function startAction(type) {
+    function openUnitMenu(id) {
+        currentUnitId = id;
+        document.getElementById('actionMenu').style.display = 'flex';
+    }
+
+    function startUnit(type) {
         closeActionMenu();
-        let pool = [];
-        if (type === 'favorites') {
-            pool = allWords.filter(w => w.fav);
-            if (pool.length === 0) { alert("Нет избранных слов."); return; }
-        } else {
-            pool = [...allWords];
-        }
-        attemptStartGame(pool, type);
-    }
-
-    function startExam() {
-        const mode = document.getElementById('modeSelect').value;
-        const shuffle = document.getElementById('shuffleCheck').checked;
-        closeSettings();
-
-        let pool = [];
-        if (mode === 'favorites') {
-            pool = allWords.filter(w => w.fav);
-            if (pool.length === 0) { alert("Нет избранных!"); return; }
-        } else {
-            pool = [...allWords];
-        }
-        attemptStartGame(pool, 'exam', shuffle);
-    }
-
-    // Проверка, есть ли сохранения перед стартом
-    function attemptStartGame(pool, type, shuffle = true) {
-        // Проверяем, есть ли в браузере сохраненный прогресс для этого типа теста
-        const savedData = localStorage.getItem('assistentProgress');
+        const category = categories.find(c => c.id === currentUnitId);
+        if (!category) return;
         
+        let pool = category.words.map(w => {
+            const favList = loadFavorites();
+            const isFav = favList.includes(w.de);
+            return { ...w, fav: isFav };
+        });
+
+        const savedData = localStorage.getItem('assistentProgress');
         if (savedData) {
             try {
                 const data = JSON.parse(savedData);
-                // Если сохраненный тип совпадает с текущим, и индекс не равен 0 (тест не закончен)
-                if (data.mode === type && data.index > 0 && data.index < pool.length) {
-                    // Показываем модальное окно "Продолжить?"
+                if (data.unitId === currentUnitId && data.mode === type && data.index > 0 && data.index < pool.length) {
                     document.getElementById('resumeModal').style.display = 'flex';
-                    // Сохраняем данные, чтобы потом использовать
-                    window.pendingGame = { pool, type, shuffle, savedData: data };
+                    window.pendingGame = { pool, type, savedData: data };
                     return;
                 }
             } catch(e) {}
         }
+        startGame(pool, type);
+    }
 
-        // Если сохранений нет, или пользователь уже нажал "Начать заново" - просто стартуем
-        startGame(pool, type, shuffle);
+    function startGame(pool, type, shuffle = true) {
+        currentQuestions = shuffle ? pool.sort(() => Math.random() - 0.5) : pool;
+        currentIndex = 0;
+        score = 0;
+        currentMode = type;
+        isResuming = false;
+
+        document.getElementById('menuScreen').style.display = 'none';
+        document.getElementById('resultScreen').style.display = 'none';
+        document.getElementById('quizScreen').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'none';
+        renderQuestion();
     }
 
     function acceptResume() {
         document.getElementById('resumeModal').style.display = 'none';
         const data = window.pendingGame.savedData;
         const pool = window.pendingGame.pool;
-        
-        // Восстанавливаем состояние
         currentQuestions = pool;
         currentIndex = data.index;
         score = data.score;
@@ -502,39 +562,17 @@
         document.getElementById('resumeModal').style.display = 'none';
         localStorage.removeItem('assistentProgress');
         const data = window.pendingGame;
-        startGame(data.pool, data.type, data.shuffle);
+        startGame(data.pool, data.type);
     }
 
-    // --- ОСНОВНОЙ СТАРТ ---
-    function startGame(pool, type, shuffle = true) {
-        currentQuestions = shuffle ? pool.sort(() => Math.random() - 0.5) : pool;
-        currentIndex = 0;
-        score = 0;
-        currentMode = type;
-        isResuming = false;
-
-        document.getElementById('menuScreen').style.display = 'none';
-        document.getElementById('resultScreen').style.display = 'none';
-        document.getElementById('quizScreen').style.display = 'block';
-        document.getElementById('nextBtn').style.display = 'none';
-        renderQuestion();
-    }
-
-    // --- ОТРИСОВКА ВОПРОСА ---
     function renderQuestion() {
         if (currentIndex >= currentQuestions.length) {
             showResult();
             return;
         }
 
-        // СОХРАНЯЕМ ПРОГРЕСС В БРАУЗЕР ПЕРЕД КАЖДЫМ ВОПРОСОМ
-        const saveData = {
-            mode: currentMode,
-            index: currentIndex,
-            score: score
-        };
+        const saveData = { unitId: currentUnitId, mode: currentMode, index: currentIndex, score: score };
         localStorage.setItem('assistentProgress', JSON.stringify(saveData));
-        localStorage.setItem('activeSession', 'true');
 
         const q = currentQuestions[currentIndex];
         document.getElementById('progressHeader').innerText = `${currentIndex+1}/${currentQuestions.length}`;
@@ -548,29 +586,23 @@
 
         const optionsContainer = document.getElementById('optionsContainer');
         const writeMode = document.getElementById('writeMode');
-        const writeInput = document.getElementById('writeInput');
-        const writeFeedback = document.getElementById('writeFeedback');
-        const writeCheckBtn = document.getElementById('writeCheckBtn');
 
         if (currentMode === 'schreiben') {
             optionsContainer.style.display = 'none';
             writeMode.style.display = 'block';
-            writeInput.value = '';
-            writeInput.className = 'write-input';
-            writeFeedback.className = 'write-feedback';
-            writeFeedback.style.display = 'none';
-            writeFeedback.innerText = '';
-            writeCheckBtn.style.display = 'block';
-            writeInput.disabled = false;
-            writeInput.focus();
-        } 
-        else {
+            const input = document.getElementById('writeInput');
+            input.value = ''; input.className = 'write-input';
+            document.getElementById('writeFeedback').className = 'write-feedback';
+            document.getElementById('writeFeedback').style.display = 'none';
+            document.getElementById('writeCheckBtn').style.display = 'block';
+            input.disabled = false; input.focus();
+        } else {
             optionsContainer.style.display = 'block';
             writeMode.style.display = 'none';
             optionsContainer.innerHTML = '';
 
             let options = [q.de];
-            let wrongOptions = allWords.filter(w => w.de !== q.de).sort(() => Math.random() - 0.5).slice(0, 3);
+            let wrongOptions = currentQuestions.filter(w => w.de !== q.de).sort(() => Math.random() - 0.5).slice(0, 3);
             options = options.concat(wrongOptions.map(w => w.de));
             options = options.sort(() => Math.random() - 0.5);
 
@@ -587,14 +619,8 @@
     function checkAnswer(selected, btnElement, correctAnswer) {
         const allBtns = document.querySelectorAll('.option-btn');
         allBtns.forEach(btn => btn.disabled = true);
-
-        if (selected === correctAnswer) {
-            btnElement.classList.add('correct');
-            score++;
-        } else {
-            btnElement.classList.add('wrong');
-            allBtns.forEach(btn => { if(btn.innerText === correctAnswer) btn.classList.add('correct'); });
-        }
+        if (selected === correctAnswer) { btnElement.classList.add('correct'); score++; } 
+        else { btnElement.classList.add('wrong'); allBtns.forEach(btn => { if(btn.innerText === correctAnswer) btn.classList.add('correct'); }); }
         document.getElementById('nextBtn').style.display = 'block';
     }
 
@@ -606,7 +632,6 @@
 
         let userAnswer = input.value.trim();
         let correctAnswer = q.de;
-
         input.disabled = true;
         checkBtn.style.display = 'none';
 
@@ -622,29 +647,23 @@
             feedback.innerText = `❌ Неправильно. Правильно: ${correctAnswer}`;
             feedback.style.display = 'block';
         }
-
         document.getElementById('nextBtn').style.display = 'block';
     }
 
-    function nextQuestion() {
-        currentIndex++;
-        renderQuestion();
-    }
+    function nextQuestion() { currentIndex++; renderQuestion(); }
 
     function toggleFavorite() {
         const q = currentQuestions[currentIndex];
         q.fav = !q.fav;
-        const original = allWords.find(w => w.id === q.id);
-        if(original) original.fav = q.fav;
+        let favList = loadFavorites();
+        if (q.fav) { if (!favList.includes(q.de)) favList.push(q.de); } 
+        else { favList = favList.filter(f => f !== q.de); }
+        saveFavorites(favList);
         renderQuestion();
-        updateFavBadge();
     }
 
     function showResult() {
-        // При завершении теста удаляем сохраненный прогресс
         localStorage.removeItem('assistentProgress');
-        localStorage.removeItem('activeSession');
-
         document.getElementById('quizScreen').style.display = 'none';
         document.getElementById('resultScreen').style.display = 'block';
         document.getElementById('scoreText').innerText = `${score} / ${currentQuestions.length}`;
@@ -652,18 +671,36 @@
         document.getElementById('gradeText').innerText = grade;
     }
 
-    // Обработка нажатия Enter в поле ввода
+    function goHome() {
+        localStorage.removeItem('assistentProgress');
+        document.getElementById('menuScreen').style.display = 'block';
+        document.getElementById('quizScreen').style.display = 'none';
+        document.getElementById('resultScreen').style.display = 'none';
+        document.getElementById('actionMenu').style.display = 'none';
+        renderMenu();
+    }
+
+    function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
+    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+    function closeActionMenu() { document.getElementById('actionMenu').style.display = 'none'; }
+
+    function startFromSettings() {
+        const shuffle = document.getElementById('shuffleCheck').checked;
+        closeSettings();
+        const category = categories.find(c => c.id === currentUnitId);
+        if (!category) return;
+        let pool = category.words.map(w => {
+            const favList = loadFavorites();
+            return { ...w, fav: favList.includes(w.de) };
+        });
+        startGame(pool, 'exam', shuffle);
+    }
+
     document.getElementById('writeInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            checkWriteAnswer();
-        }
+        if (e.key === 'Enter') checkWriteAnswer();
     });
 
-    updateFavBadge();
-
-    // Если пользователь обновил страницу, находясь внутри теста, и закрыл её, 
-    // при перезапуске браузера это всё сохранится в localStorage.
+    renderMenu();
 </script>
-
 </body>
 </html>
