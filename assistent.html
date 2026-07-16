@@ -158,7 +158,6 @@
         .btn-fav { flex: 0.5; background: #fff5e6; border: 2px solid #ffcc80; color: #e65100; }
         .btn-fav.active { background: #fff3e0; border-color: #ff9800; }
 
-        /* Кнопка прослушивания */
         .speaker-btn {
             background: none; border: none;
             font-size: 28px; cursor: pointer;
@@ -213,6 +212,9 @@
         
         .result-box { text-align: center; padding: 20px 0; }
         .result-score { font-size: 40px; color: var(--primary); font-weight: bold; margin: 10px 0; }
+
+        #renameModal .modal { text-align: left; }
+        #renameModal input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin: 10px 0;}
     </style>
 </head>
 <body>
@@ -243,10 +245,8 @@
             <div class="question-progress" id="progressText">Вопрос 1</div>
             <div class="question-text" id="questionText">Слово</div>
             
-            <!-- Блок для выбора вариантов -->
             <div id="optionsContainer"></div>
             
-            <!-- Блок для режима Правописание -->
             <div id="writeMode">
                 <p style="font-size: 14px; color: #888; margin-bottom: 5px;">Напиши перевод на немецком:</p>
                 <input type="text" class="write-input" id="writeInput" placeholder="Введите слово..." autocomplete="off" spellcheck="false">
@@ -254,7 +254,6 @@
                 <button class="btn btn-primary" id="writeCheckBtn" onclick="checkWriteAnswer()">Проверить ➜</button>
             </div>
 
-            <!-- Блок для режима Спряжение -->
             <div id="conjugationMode">
                 <p style="font-size: 14px; color: #888; margin-bottom: 5px;">Впиши правильную форму глагола для этого местоимения:</p>
                 <input type="text" class="write-input" id="conjInput" placeholder="Напиши форму..." autocomplete="off" spellcheck="false">
@@ -298,10 +297,32 @@
                 <button class="btn-half" style="background:#e0f2f1; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer;" onclick="closeSettings()">✕</button>
             </div>
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="shuffleCheck" checked>
-                <label for="shuffleCheck">Перемешать вопросы</label>
+                <input type="checkbox" id="shuffleQuestions" checked>
+                <label for="shuffleQuestions">Перемешать вопросы</label>
             </div>
-            <button class="btn btn-primary" style="width:100%;" onclick="startFromSettings()">Сохранить</button>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="shuffleAnswers">
+                <label for="shuffleAnswers">Перемешать ответы</label>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="favOnly">
+                <label for="favOnly">Только избранные вопросы</label>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="saveSettings()">Сохранить</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="renameModal">
+        <div class="modal" style="text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0;">Переименовать</h3>
+                <button class="btn-half" style="background:#e0f2f1; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer;" onclick="closeRename()">✕</button>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; display: block; margin-bottom: 5px;">Введи новое название:</label>
+                <input type="text" id="renameInput" placeholder="Новое название...">
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="saveRename()">Сохранить</button>
         </div>
     </div>
 
@@ -323,6 +344,10 @@
                 <span>🔄</span> Повтор ошибок
             </div>
             <div style="border-top: 1px solid #eee; margin: 10px 0;"></div>
+            <div class="action-item" onclick="openRenameModal()">
+                <span>✏️</span> Переименовать
+            </div>
+            <div style="border-top: 1px solid #eee; margin: 10px 0;"></div>
             <div class="action-item" onclick="closeActionMenu()" style="color: #e74c3c;">
                 <span>✕</span> Закрыть
             </div>
@@ -331,484 +356,339 @@
 </div>
 
 <script>
-    // --- БАЗА ДАННЫХ: ЮНИТЫ И ПОДГРУППЫ ---
     const units = [
-        { 
-            id: 'unit1', 
-            title: '📖 Юнит 1 (Lektion 1)', 
-            subs: [
-                { id: 'u1_objects', title: 'Предметы', words: [
-                    { de: "der Tisch", ru: "стол" }, { de: "der Stuhl", ru: "стул" }, { de: "der Stift", ru: "карандаш" },
-                    { de: "der Computer", ru: "компьютер" }, { de: "der Wagen", ru: "машина" }, { de: "der Mensch", ru: "человек" },
-                    { de: "die Lampe", ru: "лампа" }, { de: "die Tasche", ru: "сумка" }, { de: "die Blume", ru: "цветок" },
-                    { de: "die Vase", ru: "ваза" }, { de: "die Straße", ru: "улица" }, { de: "die Übung", ru: "упражнение" },
-                    { de: "die Zeitung", ru: "газета" }, { de: "die Zeitschrift", ru: "журнал" }, { de: "das Buch", ru: "книга" },
-                    { de: "das Bild", ru: "картина" }, { de: "das Wort", ru: "слово" }, { de: "das Haus", ru: "дом" },
-                    { de: "das Zimmer", ru: "комната" }, { de: "das Kind", ru: "ребенок" }, { de: "das Mädchen", ru: "девочка" },
-                    { de: "das Spielzeug", ru: "игрушка" }, { de: "der Buchstabe", ru: "буква" }, { de: "der Brief", ru: "письмо" },
-                    { de: "der Text", ru: "текст" }, { de: "der Satz", ru: "предложение" }, { de: "die Zahl", ru: "цифра" },
-                    { de: "die Gruppe", ru: "группа" }, { de: "die Partnerin", ru: "партнерша" }, { de: "die Tabelle", ru: "таблица" },
-                    { de: "die Kursleiterin", ru: "руководитель" }, { de: "das Gespräch", ru: "разговор" }, { de: "das Foto", ru: "фото" },
-                    { de: "die Wendung", ru: "выражение" }
-                ]},
-                { id: 'u1_verbs', title: 'Глаголы и команды', words: [
-                    { de: "Sprechen Sie!", ru: "Говорите!" }, { de: "Schreiben Sie!", ru: "Пишите!" },
-                    { de: "Lesen Sie!", ru: "Читайте!" }, { de: "Hören Sie!", ru: "Слушайте!" },
-                    { de: "Arbeiten Sie zu zweit!", ru: "Работайте вдвоем!" }, { de: "Arbeiten Sie in der Gruppe!", ru: "Работайте в группе!" },
-                    { de: "Fragen und Antworten Sie!", ru: "Спрашивайте и отвечайте!" }, { de: "Zeigen Sie!", ru: "Показывайте!" },
-                    { de: "Ergänzen Sie!", ru: "Заполните!" }, { de: "Kreuzen Sie an!", ru: "Поставьте галочку!" },
-                    { de: "Ordnen Sie zu!", ru: "Упорядочьте!" }, { de: "Markieren Sie!", ru: "Отмечайте!" },
-                    { de: "Zeichnen Sie!", ru: "Рисуйте!" }, { de: "kommen", ru: "приходить" }, { de: "heißen", ru: "называться" },
-                    { de: "vergleichen", ru: "сравнивать" }, { de: "üben", ru: "упражняться" }, { de: "glauben", ru: "верить" },
-                    { de: "haben", ru: "иметь" }, { de: "machen", ru: "делать" }, { de: "arbeiten", ru: "работать" },
-                    { de: "studieren", ru: "учиться" }, { de: "leben", ru: "жить" }, { de: "wohnen", ru: "проживать" }
-                ]},
-                { id: 'u1_phrases', title: 'Фразы и приветствия', words: [
-                    { de: "Ich verstehe das nicht", ru: "Я это не понимаю" }, { de: "Wie schreibt man das?", ru: "Как это пишется?" },
-                    { de: "Was heißt das?", ru: "Как это называется?" }, { de: "Wie spricht man das aus?", ru: "Как произносится?" },
-                    { de: "Was sollen wir tun?", ru: "Что мы должны делать?" }, { de: "Helfen Sie mir bitte", ru: "Помогите мне" },
-                    { de: "Wie geht's?", ru: "Как дела?" }, { de: "Wie geht es dir?", ru: "Как у тебя дела?" },
-                    { de: "Wie geht es Ihnen?", ru: "Как у вас дела?" }, { de: "auf Wiedersehen", ru: "до свидания" },
-                    { de: "der Tag", ru: "день" }, { de: "Guten Tag", ru: "добрый день" }, { de: "Guten Morgen", ru: "доброе утро" },
-                    { de: "Guten Abend", ru: "добрый вечер" }, { de: "Gute Nacht", ru: "спокойной ночи" },
-                    { de: "sehr gut", ru: "очень хорошо" }, { de: "gut", ru: "хорошо" }, { de: "es geht", ru: "нормально" },
-                    { de: "nicht so gut", ru: "не очень хорошо" }, { de: "schlecht", ru: "плохо" }, { de: "danke", ru: "спасибо" },
-                    { de: "tschüss", ru: "пока" }, { de: "weiter", ru: "дальше" }, { de: "die Begrüßung", ru: "приветствие" },
-                    { de: "der Abschied", ru: "прощание" }, { de: "Verabschieden Sie sich", ru: "Попрощайтесь" },
-                    { de: "die Kommunikation", ru: "коммуникация" }, { de: "die Persönlichkeit", ru: "личность" },
-                    { de: "auf", ru: "на" }, { de: "aus", ru: "из" }, { de: "aber", ru: "но" }, { de: "kein", ru: "никакой" },
-                    { de: "nicht", ru: "не" }
-                ]},
-                { id: 'u1_wfragen', title: 'W-Fragen', words: [
-                    { de: "W-Fragen", ru: "Вопросы с W" }, { de: "Was?", ru: "Что?" }, { de: "Wo?", ru: "Где?" },
-                    { de: "Wer?", ru: "Кто?" }, { de: "Woher?", ru: "Откуда?" }, { de: "Warum?", ru: "Почему?" },
-                    { de: "Wie oft?", ru: "Как часто?" }, { de: "Wie?", ru: "Как?" }
-                ]}
-            ]
-        },
-        { 
-            id: 'unit2', 
-            title: '📖 Юнит 2 (Lektion 2)', 
-            subs: [
-                { id: 'u2_prof_add', title: 'Профессии (доп.)', words: [
-                    { de: "der Journalist", ru: "журналист" },
-                    { de: "der Ingenieur", ru: "инженер" },
-                    { de: "der Mechatroniker", ru: "механик" },
-                    { de: "der Schauspieler", ru: "актер" },
-                    { de: "der Student", ru: "студент" }
-                ]},
-                { id: 'u2_jobs_life', title: 'Профессии и Личное', words: [
-                    { de: "der Friseur", ru: "парикмахер" },
-                    { de: "der Architekt", ru: "архитектор" },
-                    { de: "der Sekretär", ru: "секретарь" },
-                    { de: "der Arzt", ru: "доктор" },
-                    { de: "der Lehrer", ru: "учитель" },
-                    { de: "der Verkäufer", ru: "продавец" },
-                    { de: "der Kellner", ru: "официант" },
-                    { de: "die Krankenschwester", ru: "медсестра" },
-                    { de: "der Flugbegleiter", ru: "бортпроводник" },
-                    { de: "der Rechtsanwalt", ru: "юрист" },
-                    { de: "der Beruf", ru: "профессия" },
-                    { de: "die Arbeit", ru: "работа" },
-                    { de: "die Ausbildung", ru: "специальность" },
-                    { de: "der Familienstand", ru: "Семейный статус" },
-                    { de: "geschieden", ru: "разведенный" },
-                    { de: "verheiratet", ru: "женат/замужем" },
-                    { de: "zusammen", ru: "вместе" },
-                    { de: "das Kind", ru: "ребенок" },
-                    { de: "single", ru: "холостой" },
-                    { de: "allein", ru: "один" }
-                ]},
-                { id: 'u2_verbs_actions', title: 'Глаголы и действия', words: [
-                    { de: "studieren", ru: "учиться" },
-                    { de: "verkaufen", ru: "продавать" },
-                    { de: "erklären", ru: "объяснять" },
-                    { de: "reparieren", ru: "чинить" },
-                    { de: "spielen", ru: "играть" },
-                    { de: "sortieren", ru: "сортировать" },
-                    { de: "sprechen", ru: "говорить" },
-                    { de: "helfen", ru: "помогать" },
-                    { de: "montieren", ru: "чинить/монтировать" },
-                    { de: "telefonieren", ru: "звонить" },
-                    { de: "Interviews machen", ru: "брать интервью" },
-                    { de: "Medikamente geben", ru: "давать лекарство" },
-                    { de: "Texte schreiben", ru: "писать текст" },
-                    { de: "am Computer arbeiten", ru: "работать на компьютере" },
-                    { de: "lernen", ru: "изучать" },
-                    { de: "bekommen", ru: "получать" },
-                    { de: "reservieren", ru: "резервировать" },
-                    { de: "gehören", ru: "принадлежать" },
-                    { de: "erkennen", ru: "узнавать" },
-                    { de: "beschreiben", ru: "описывать" },
-                    { de: "diskutieren", ru: "обсуждать" },
-                    { de: "wiederholen", ru: "повторять" },
-                    { de: "gratulieren", ru: "поздравлять" },
-                    { de: "danken", ru: "благодарить" },
-                    { de: "verstehen", ru: "понимать" },
-                    { de: "wissen", ru: "знать" },
-                    { de: "fliegen", ru: "летать" },
-                    { de: "verlieren", ru: "потерять" }
-                ]},
-                { id: 'u2_phrases_prep', title: 'Фразы и предлоги', words: [
-                    { de: "die Visitenkarte", ru: "визитная карточка" },
-                    { de: "das Krankenhaus", ru: "больница" },
-                    { de: "die Entschuldigung", ru: "извинение" },
-                    { de: "beruflich", ru: "по профессии" },
-                    { de: "noch einmal", ru: "еще раз" },
-                    { de: "der Wohnort", ru: "место жительства" },
-                    { de: "auf", ru: "над" },
-                    { de: "dann", ru: "потом" },
-                    { de: "stehen", ru: "стоять" },
-                    { de: "Ich arbeite als Lehrer", ru: "Я работаю как учитель" },
-                    { de: "Ich bin Lehrer", ru: "Я учитель" },
-                    { de: "Ich arbeite bei BMW", ru: "Я работаю в BMW" },
-                    { de: "zu kompliziert", ru: "очень сложно" },
-                    { de: "Er wohnt in Köln", ru: "Он живет в Кёльне" },
-                    { de: "Er wohnt nicht in Köln", ru: "Он не живет в Кёльне" },
-                    { de: "Sehen Sie das Foto an", ru: "Смотрите на фото" },
-                    { de: "Die Frau auf dem Bild ist Herberts Mutter", ru: "Женщина на фото - мать Герберта" },
-                    { de: "Ich lebe allein", ru: "Я живу один" },
-                    { de: "Wir sind verheiratet", ru: "Мы женаты" },
-                    { de: "Wir sind nicht verheiratet", ru: "Мы не женаты" }
-                ]}
-            ]
-        },
-        { 
-            id: 'unit3', 
-            title: '📖 Юнит 3 (Lektion 3)', 
-            subs: [
-                { id: 'u3_family', title: 'Семья и родственники', words: [
-                    { de: "das Familienmitglied", ru: "член семьи" },
-                    { de: "der Vater", ru: "отец" },
-                    { de: "die Mutter", ru: "мать" },
-                    { de: "die Eltern", ru: "родители" },
-                    { de: "der Sohn", ru: "сын" },
-                    { de: "die Tochter", ru: "дочь" },
-                    { de: "der Bruder", ru: "брат" },
-                    { de: "die Schwester", ru: "сестра" },
-                    { de: "die Geschwister", ru: "брат и сестра" },
-                    { de: "der Großvater", ru: "дедушка" },
-                    { de: "der Opa", ru: "дедушка" },
-                    { de: "die Großmutter", ru: "бабушка" },
-                    { de: "die Oma", ru: "бабушка" },
-                    { de: "die Großeltern", ru: "бабушка и дедушка" },
-                    { de: "die Enkelin", ru: "внучка" },
-                    { de: "der Enkel", ru: "внук" },
-                    { de: "der Ehemann", ru: "муж" },
-                    { de: "die Ehefrau", ru: "жена" }
-                ]},
-                { id: 'u3_countries', title: 'Страны и регионы', words: [
-                    { de: "Belgien", ru: "Бельгия" },
-                    { de: "Dänemark", ru: "Дания" },
-                    { de: "Frankreich", ru: "Франция" },
-                    { de: "Italien", ru: "Италия" },
-                    { de: "Liechtenstein", ru: "Лихтенштейн" },
-                    { de: "Luxemburg", ru: "Люксембург" },
-                    { de: "Niederlande", ru: "Нидерланды" },
-                    { de: "Österreich", ru: "Австрия" },
-                    { de: "Polen", ru: "Польша" },
-                    { de: "die Schweiz", ru: "Швейцария" },
-                    { de: "Slowakei", ru: "Словакия" },
-                    { de: "Slowenien", ru: "Словения" },
-                    { de: "Tschechien", ru: "Чехия" },
-                    { de: "Ungarn", ru: "Венгрия" }
-                ]},
-                { id: 'u3_languages', title: 'Языки и национальности', words: [
-                    { de: "die Fremdsprache", ru: "иностранный язык" },
-                    { de: "die Sprachen", ru: "Языки" },
-                    { de: "Deutsch", ru: "немецкий" },
-                    { de: "Englisch", ru: "английский" },
-                    { de: "Russisch", ru: "русский" },
-                    { de: "Finnisch", ru: "финский" },
-                    { de: "Luxemburgisch", ru: "люксембургский" },
-                    { de: "Spanisch", ru: "испанский" },
-                    { de: "Französisch", ru: "французский" },
-                    { de: "Italienisch", ru: "итальянский" },
-                    { de: "Rätoromanisch", ru: "ретороманский" },
-                    { de: "Niederländisch", ru: "нидерландский" },
-                    { de: "Polnisch", ru: "польский" },
-                    { de: "Schwedisch", ru: "шведский" },
-                    { de: "Slowakisch", ru: "словацкий" },
-                    { de: "Slowenisch", ru: "словенский" },
-                    { de: "Tschechisch", ru: "чешский" },
-                    { de: "Ungarisch", ru: "венгерский" }
-                ]},
-                { id: 'u3_verbs_phrases', title: 'Глаголы и Фразы', words: [
-                    { de: "selbst", ru: "сам" },
-                    { de: "Drehbuchausschnitt", ru: "отрывок из сценария" },
-                    { de: "der Wohnort", ru: "место жительства" },
-                    { de: "der Zettel", ru: "записка" },
-                    { de: "das Gebiet", ru: "район" },
-                    { de: "farbig", ru: "цветной" },
-                    { de: "die Hilfe", ru: "помощь" },
-                    { de: "kochen", ru: "готовить" },
-                    { de: "skaten", ru: "кататься на скейтборде" },
-                    { de: "zurzeit", ru: "в данный момент" },
-                    { de: "bald", ru: "скоро" },
-                    { de: "fertig", ru: "готово" },
-                    { de: "gehen", ru: "идти" },
-                    { de: "zurück", ru: "назад" },
-                    { de: "der Stammbaum", ru: "семейное дерево" },
-                    { de: "der Chemiefacharbeiter", ru: "химический рабочий" },
-                    { de: "mehr", ru: "больше" },
-                    { de: "moderieren", ru: "вести, комментировать" },
-                    { de: "bis", ru: "до" },
-                    { de: "der Sänger", ru: "певец" },
-                    { de: "wählen", ru: "выбирать" },
-                    { de: "das Ergebnis", ru: "результат" },
-                    { de: "die Länder", ru: "Страны" },
-                    { de: "jetzt", ru: "сейчас" }
-                ]},
-                { id: 'u3_numbers', title: '🔢 Числа от 0 до 1 млн.', words: [
-                    { de: "null", ru: "ноль" },
-                    { de: "eins", ru: "один" },
-                    { de: "zwei", ru: "два" },
-                    { de: "drei", ru: "три" },
-                    { de: "vier", ru: "четыре" },
-                    { de: "fünf", ru: "пять" },
-                    { de: "sechs", ru: "шесть" },
-                    { de: "sieben", ru: "семь" },
-                    { de: "acht", ru: "восемь" },
-                    { de: "neun", ru: "девять" },
-                    { de: "zehn", ru: "десять" },
-                    { de: "elf", ru: "одиннадцать" },
-                    { de: "zwölf", ru: "двенадцать" },
-                    { de: "dreizehn", ru: "тринадцать" },
-                    { de: "vierzehn", ru: "четырнадцать" },
-                    { de: "fünfzehn", ru: "пятнадцать" },
-                    { de: "sechzehn", ru: "шестнадцать" },
-                    { de: "siebzehn", ru: "семнадцать" },
-                    { de: "achtzehn", ru: "восемнадцать" },
-                    { de: "neunzehn", ru: "девятнадцать" },
-                    { de: "zwanzig", ru: "двадцать" },
-                    { de: "dreißig", ru: "тридцать" },
-                    { de: "vierzig", ru: "сорок" },
-                    { de: "fünfzig", ru: "пятьдесят" },
-                    { de: "sechzig", ru: "шестьдесят" },
-                    { de: "siebzig", ru: "семьдесят" },
-                    { de: "achtzig", ru: "восемьдесят" },
-                    { de: "neunzig", ru: "девяносто" },
-                    { de: "einhundert", ru: "сто" },
-                    { de: "tausend", ru: "тысяча" },
-                    { de: "zehntausend", ru: "десять тысяч" },
-                    { de: "hunderttausend", ru: "сто тысяч" },
-                    { de: "eine Million", ru: "один миллион" },
-                    { de: "fünfundzwanzig", ru: "двадцать пять" }
-                ]}
-            ]
-        },
-        { 
-            id: 'unit4', 
-            title: '📖 Юнит 4 (Части речи)', 
-            subs: [
-                { id: 'u4_nouns', title: 'Существительные (Nomen)', words: [
-                    { de: "der Tisch", ru: "стол" },
-                    { de: "der Stuhl", ru: "стул" },
-                    { de: "der Stift", ru: "карандаш" },
-                    { de: "der Computer", ru: "компьютер" },
-                    { de: "der Wagen", ru: "машина" },
-                    { de: "der Mensch", ru: "человек" },
-                    { de: "der Buchstabe", ru: "буква" },
-                    { de: "der Brief", ru: "письмо" },
-                    { de: "der Text", ru: "текст" },
-                    { de: "der Satz", ru: "предложение" },
-                    { de: "der Tag", ru: "день" },
-                    { de: "der Arbeitgeber", ru: "работодатель" },
-                    { de: "der Beruf", ru: "профессия" },
-                    { de: "der Job", ru: "работа" },
-                    { de: "der Architekt", ru: "архитектор" },
-                    { de: "der Arzt", ru: "врач" },
-                    { de: "der Friseur", ru: "парикмахер" },
-                    { de: "der Ingenieur", ru: "инженер" },
-                    { de: "der Journalist", ru: "журналист" },
-                    { de: "der Kellner", ru: "официант" },
-                    { de: "der Lehrer", ru: "учитель" },
-                    { de: "der Student", ru: "студент" },
-                    { de: "der Schauspieler", ru: "актер" },
-                    { de: "der Schüler", ru: "ученик" },
-                    { de: "der Sekretär", ru: "секретарь" },
-                    { de: "der Verkäufer", ru: "продавец" },
-                    { de: "der Familienstand", ru: "семейное положение" },
-                    { de: "der Wohnort", ru: "место жительства" },
-                    { de: "der Vater", ru: "отец" },
-                    { de: "der Sohn", ru: "сын" },
-                    { de: "der Bruder", ru: "брат" },
-                    { de: "der Großvater", ru: "дедушка" },
-                    { de: "der Opa", ru: "дедушка" },
-                    { de: "der Enkel", ru: "внук" },
-                    { de: "der Ehemann", ru: "муж" },
-                    { de: "der Zettel", ru: "записка" },
-                    { de: "der Stammbaum", ru: "семейное дерево" },
-                    { de: "der Sänger", ru: "певец" },
-                    { de: "der Chemiefacharbeiter", ru: "химический рабочий" },
-                    { de: "die Lampe", ru: "лампа" },
-                    { de: "die Tasche", ru: "сумка" },
-                    { de: "die Blume", ru: "цветок" },
-                    { de: "die Vase", ru: "ваза" },
-                    { de: "die Straße", ru: "улица" },
-                    { de: "die Übung", ru: "упражнение" },
-                    { de: "die Zeitung", ru: "газета" },
-                    { de: "die Zeitschrift", ru: "журнал" },
-                    { de: "die Zahl", ru: "цифра" },
-                    { de: "die Gruppe", ru: "группа" },
-                    { de: "die Partnerin", ru: "партнерша" },
-                    { de: "die Tabelle", ru: "таблица" },
-                    { de: "die Kursleiterin", ru: "руководитель курса" },
-                    { de: "die Schule", ru: "школа" },
-                    { de: "die Stelle", ru: "должность" },
-                    { de: "die Krankenschwester", ru: "медсестра" },
-                    { de: "die Visitenkarte", ru: "визитка" },
-                    { de: "die Entschuldigung", ru: "извинение" },
-                    { de: "die Mutter", ru: "мать" },
-                    { de: "die Tochter", ru: "дочь" },
-                    { de: "die Schwester", ru: "сестра" },
-                    { de: "die Geschwister", ru: "братья и сестры" },
-                    { de: "die Großmutter", ru: "бабушка" },
-                    { de: "die Oma", ru: "бабушка" },
-                    { de: "die Großeltern", ru: "бабушка и дедушка" },
-                    { de: "die Enkelin", ru: "внучка" },
-                    { de: "die Ehefrau", ru: "жена" },
-                    { de: "die Fremdsprache", ru: "иностранный язык" },
-                    { de: "die Schweiz", ru: "Швейцария" },
-                    { de: "die Hilfe", ru: "помощь" },
-                    { de: "die Länder", ru: "страны" },
-                    { de: "das Buch", ru: "книга" },
-                    { de: "das Bild", ru: "картина" },
-                    { de: "das Wort", ru: "слово" },
-                    { de: "das Haus", ru: "дом" },
-                    { de: "das Zimmer", ru: "комната" },
-                    { de: "das Kind", ru: "ребенок" },
-                    { de: "das Mädchen", ru: "девочка" },
-                    { de: "das Spielzeug", ru: "игрушка" },
-                    { de: "das Gespräch", ru: "разговор" },
-                    { de: "das Foto", ru: "фотография" },
-                    { de: "das Alter", ru: "возраст" },
-                    { de: "das Jahr", ru: "год" },
-                    { de: "das Praktikum", ru: "практика" },
-                    { de: "das Krankenhaus", ru: "больница" },
-                    { de: "das Familienmitglied", ru: "член семьи" },
-                    { de: "das Gebiet", ru: "район" },
-                    { de: "das Ergebnis", ru: "результат" }
-                ]},
-                { id: 'u4_adjectives', title: 'Прилагательные (Adjektive)', words: [
-                    { de: "gut", ru: "хороший" },
-                    { de: "schlecht", ru: "плохой" },
-                    { de: "richtig", ru: "правильный" },
-                    { de: "falsch", ru: "неправильный" },
-                    { de: "super", ru: "суперский" },
-                    { de: "farbig", ru: "цветной" },
-                    { de: "beruflich", ru: "профессиональный" },
-                    { de: "fertig", ru: "готовый" },
-                    { de: "verheiratet", ru: "женатый/замужняя" },
-                    { de: "geschieden", ru: "разведенный" },
-                    { de: "kompliziert", ru: "сложный" },
-                    { de: "allein", ru: "одинокий / один" },
-                    { de: "selbst", ru: "сам" },
-                    { de: "mehr", ru: "больше" },
-                    { de: "bald", ru: "скоро" },
-                    { de: "zurzeit", ru: "в данный момент" },
-                    { de: "single", ru: "холостой" },
-                    { de: "arbeitslos", ru: "безработный" }
-                ]},
-                { id: 'u4_verbs', title: 'Глаголы (Verben)', words: [
-                    { de: "kommen", ru: "приходить" },
-                    { de: "heißen", ru: "называться" },
-                    { de: "vergleichen", ru: "сравнивать" },
-                    { de: "üben", ru: "упражняться" },
-                    { de: "arbeiten", ru: "работать" },
-                    { de: "studieren", ru: "учиться" },
-                    { de: "leben", ru: "жить" },
-                    { de: "wohnen", ru: "проживать" },
-                    { de: "glauben", ru: "верить" },
-                    { de: "haben", ru: "иметь" },
-                    { de: "machen", ru: "делать" },
-                    { de: "sprechen", ru: "говорить" },
-                    { de: "schreiben", ru: "писать" },
-                    { de: "lesen", ru: "читать" },
-                    { de: "hören", ru: "слушать" },
-                    { de: "fragen", ru: "спрашивать" },
-                    { de: "antworten", ru: "отвечать" },
-                    { de: "zeigen", ru: "показывать" },
-                    { de: "ergänzen", ru: "заполнять" },
-                    { de: "kreuzen", ru: "отмечать крестом" },
-                    { de: "ordnen", ru: "упорядочивать" },
-                    { de: "markieren", ru: "отмечать" },
-                    { de: "zeichnen", ru: "рисовать" },
-                    { de: "verstehen", ru: "понимать" },
-                    { de: "helfen", ru: "помогать" },
-                    { de: "telefonieren", ru: "звонить" },
-                    { de: "sortieren", ru: "сортировать" },
-                    { de: "reparieren", ru: "чинить" },
-                    { de: "erklären", ru: "объяснять" },
-                    { de: "spielen", ru: "играть" },
-                    { de: "montieren", ru: "монтировать" },
-                    { de: "beschreiben", ru: "описывать" },
-                    { de: "diskutieren", ru: "обсуждать" },
-                    { de: "wiederholen", ru: "повторять" },
-                    { de: "gratulieren", ru: "поздравлять" },
-                    { de: "danken", ru: "благодарить" },
-                    { de: "wissen", ru: "знать" },
-                    { de: "fliegen", ru: "летать" },
-                    { de: "verlieren", ru: "терять" },
-                    { de: "bekommen", ru: "получать" },
-                    { de: "reservieren", ru: "резервировать" },
-                    { de: "gehören", ru: "принадлежать" },
-                    { de: "erkennen", ru: "узнавать" },
-                    { de: "gehen", ru: "идти" },
-                    { de: "kochen", ru: "готовить" },
-                    { de: "skaten", ru: "кататься на скейте" },
-                    { de: "moderieren", ru: "вести (программу)" },
-                    { de: "wählen", ru: "выбирать" },
-                    { de: "stehen", ru: "стоять" },
-                    { de: "lernen", ru: "изучать" },
-                    { de: "verkaufen", ru: "продавать" },
-                    { de: "sehen", ru: "смотреть" },
-                    { de: "ankreuzen", ru: "отметить галочкой" }
-                ]}
-            ]
-        },
-        // --- НОВЫЙ ЮНИТ 5 (Только глаголы и их спряжение) ---
-        { 
-            id: 'unit5', 
-            title: '📖 Юнит 5 (Глаголы: Спряжение)', 
-            subs: [
-                { id: 'u5_verbs_conjugation', title: 'Базовые глаголы (A1)', words: [
-                    { de: "kommen", ru: "приходить", conjugation: { ich: "komme", du: "kommst", er: "kommt", wir: "kommen", ihr: "kommt", sie: "kommen" } },
-                    { de: "arbeiten", ru: "работать", conjugation: { ich: "arbeite", du: "arbeitest", er: "arbeitet", wir: "arbeiten", ihr: "arbeitet", sie: "arbeiten" } },
-                    { de: "haben", ru: "иметь", conjugation: { ich: "habe", du: "hast", er: "hat", wir: "haben", ihr: "habt", sie: "haben" } },
-                    { de: "sein", ru: "быть", conjugation: { ich: "bin", du: "bist", er: "ist", wir: "sind", ihr: "seid", sie: "sind" } },
-                    { de: "gehen", ru: "идти", conjugation: { ich: "gehe", du: "gehst", er: "geht", wir: "gehen", ihr: "geht", sie: "gehen" } },
-                    { de: "sprechen", ru: "говорить", conjugation: { ich: "spreche", du: "sprichst", er: "spricht", wir: "sprechen", ihr: "sprecht", sie: "sprechen" } },
-                    { de: "sehen", ru: "видеть / смотреть", conjugation: { ich: "sehe", du: "siehst", er: "sieht", wir: "sehen", ihr: "seht", sie: "sehen" } },
-                    { de: "nehmen", ru: "брать", conjugation: { ich: "nehme", du: "nimmst", er: "nimmt", wir: "nehmen", ihr: "nehmt", sie: "nehmen" } },
-                    { de: "geben", ru: "давать", conjugation: { ich: "gebe", du: "gibst", er: "gibt", wir: "geben", ihr: "gebt", sie: "geben" } },
-                    { de: "lesen", ru: "читать", conjugation: { ich: "lese", du: "liest", er: "liest", wir: "lesen", ihr: "lest", sie: "lesen" } },
-                    { de: "essen", ru: "есть", conjugation: { ich: "esse", du: "isst", er: "isst", wir: "essen", ihr: "esst", sie: "essen" } },
-                    { de: "wissen", ru: "знать", conjugation: { ich: "weiß", du: "weißt", er: "weiß", wir: "wissen", ihr: "wisst", sie: "wissen" } },
-                    { de: "können", ru: "мочь (уметь)", conjugation: { ich: "kann", du: "kannst", er: "kann", wir: "können", ihr: "könnt", sie: "können" } },
-                    { de: "müssen", ru: "быть должным", conjugation: { ich: "muss", du: "musst", er: "muss", wir: "müssen", ihr: "müsst", sie: "müssen" } },
-                    { de: "wollen", ru: "хотеть", conjugation: { ich: "will", du: "willst", er: "will", wir: "wollen", ihr: "wollt", sie: "wollen" } },
-                    { de: "rufen", ru: "звать / кричать", conjugation: { ich: "rufe", du: "rufst", er: "ruft", wir: "rufen", ihr: "ruft", sie: "rufen" } },
-                    { de: "anrufen", ru: "звонить (по телефону)", conjugation: { ich: "rufe an", du: "rufst an", er: "ruft an", wir: "rufen an", ihr: "ruft an", sie: "rufen an" } },
-                    { de: "heißen", ru: "называться", conjugation: { ich: "heiße", du: "heißt", er: "heißt", wir: "heißen", ihr: "heißt", sie: "heißen" } },
-                    { de: "machen", ru: "делать", conjugation: { ich: "mache", du: "machst", er: "macht", wir: "machen", ihr: "macht", sie: "machen" } },
-                    { de: "wohnen", ru: "проживать", conjugation: { ich: "wohne", du: "wohnst", er: "wohnt", wir: "wohnen", ihr: "wohnt", sie: "wohnen" } },
-                    { de: "studieren", ru: "учиться в вузе", conjugation: { ich: "studiere", du: "studierts", er: "studiert", wir: "studieren", ihr: "studiert", sie: "studieren" } },
-                    { de: "schreiben", ru: "писать", conjugation: { ich: "schreibe", du: "schreibst", er: "schreibt", wir: "schreiben", ihr: "schreibt", sie: "schreiben" } },
-                    { de: "helfen", ru: "помогать", conjugation: { ich: "helfe", du: "hilfst", er: "hilft", wir: "helfen", ihr: "helft", sie: "helfen" } },
-                    { de: "trinken", ru: "пить", conjugation: { ich: "trinke", du: "trinkst", er: "trinkt", wir: "trinken", ihr: "trinkt", sie: "trinken" } },
-                    { de: "fahren", ru: "ехать", conjugation: { ich: "fahre", du: "fährst", er: "fährt", wir: "fahren", ihr: "fahrt", sie: "fahren" } },
-                    { de: "schlafen", ru: "спать", conjugation: { ich: "schlafe", du: "schläfst", er: "schläft", wir: "schlafen", ihr: "schlaft", sie: "schlafen" } },
-                    { de: "laufen", ru: "бежать / идти пешком", conjugation: { ich: "laufe", du: "läufst", er: "läuft", wir: "laufen", ihr: "lauft", sie: "laufen" } },
-                    { de: "ziehen", ru: "тянуть / переезжать", conjugation: { ich: "ziehe", du: "ziehst", er: "zieht", wir: "ziehen", ihr: "zieht", sie: "ziehen" } },
-                    { de: "fliegen", ru: "летать", conjugation: { ich: "fliege", du: "fliegst", er: "fliegt", wir: "fliegen", ihr: "fliegt", sie: "fliegen" } },
-                    { de: "waschen", ru: "мыть / стирать", conjugation: { ich: "wasche", du: "wäschst", er: "wäscht", wir: "waschen", ihr: "wascht", sie: "waschen" } }
-                ]}
-            ]
-        }
+        { id: 'unit1', title: '📖 Юнит 1 (Lektion 1)', subs: [
+            { id: 'u1_objects', title: 'Предметы', words: [
+                { de: "der Tisch", ru: "стол" }, { de: "der Stuhl", ru: "стул" }, { de: "der Stift", ru: "карандаш" },
+                { de: "der Computer", ru: "компьютер" }, { de: "der Wagen", ru: "машина" }, { de: "der Mensch", ru: "человек" },
+                { de: "die Lampe", ru: "лампа" }, { de: "die Tasche", ru: "сумка" }, { de: "die Blume", ru: "цветок" },
+                { de: "die Vase", ru: "ваза" }, { de: "die Straße", ru: "улица" }, { de: "die Übung", ru: "упражнение" },
+                { de: "die Zeitung", ru: "газета" }, { de: "die Zeitschrift", ru: "журнал" }, { de: "das Buch", ru: "книга" },
+                { de: "das Bild", ru: "картина" }, { de: "das Wort", ru: "слово" }, { de: "das Haus", ru: "дом" },
+                { de: "das Zimmer", ru: "комната" }, { de: "das Kind", ru: "ребенок" }, { de: "das Mädchen", ru: "девочка" },
+                { de: "das Spielzeug", ru: "игрушка" }, { de: "der Buchstabe", ru: "буква" }, { de: "der Brief", ru: "письмо" },
+                { de: "der Text", ru: "текст" }, { de: "der Satz", ru: "предложение" }, { de: "die Zahl", ru: "цифра" },
+                { de: "die Gruppe", ru: "группа" }, { de: "die Partnerin", ru: "партнерша" }, { de: "die Tabelle", ru: "таблица" },
+                { de: "die Kursleiterin", ru: "руководитель" }, { de: "das Gespräch", ru: "разговор" }, { de: "das Foto", ru: "фото" },
+                { de: "die Wendung", ru: "выражение" }
+            ]},
+            { id: 'u1_verbs', title: 'Глаголы и команды', words: [
+                { de: "Sprechen Sie!", ru: "Говорите!" }, { de: "Schreiben Sie!", ru: "Пишите!" },
+                { de: "Lesen Sie!", ru: "Читайте!" }, { de: "Hören Sie!", ru: "Слушайте!" },
+                { de: "Arbeiten Sie zu zweit!", ru: "Работайте вдвоем!" }, { de: "Arbeiten Sie in der Gruppe!", ru: "Работайте в группе!" },
+                { de: "Fragen und Antworten Sie!", ru: "Спрашивайте и отвечайте!" }, { de: "Zeigen Sie!", ru: "Показывайте!" },
+                { de: "Ergänzen Sie!", ru: "Заполните!" }, { de: "Kreuzen Sie an!", ru: "Поставьте галочку!" },
+                { de: "Ordnen Sie zu!", ru: "Упорядочьте!" }, { de: "Markieren Sie!", ru: "Отмечайте!" },
+                { de: "Zeichnen Sie!", ru: "Рисуйте!" }, { de: "kommen", ru: "приходить" }, { de: "heißen", ru: "называться" },
+                { de: "vergleichen", ru: "сравнивать" }, { de: "üben", ru: "упражняться" }, { de: "glauben", ru: "верить" },
+                { de: "haben", ru: "иметь" }, { de: "machen", ru: "делать" }, { de: "arbeiten", ru: "работать" },
+                { de: "studieren", ru: "учиться" }, { de: "leben", ru: "жить" }, { de: "wohnen", ru: "проживать" }
+            ]},
+            { id: 'u1_phrases', title: 'Фразы и приветствия', words: [
+                { de: "Ich verstehe das nicht", ru: "Я это не понимаю" }, { de: "Wie schreibt man das?", ru: "Как это пишется?" },
+                { de: "Was heißt das?", ru: "Как это называется?" }, { de: "Wie spricht man das aus?", ru: "Как произносится?" },
+                { de: "Was sollen wir tun?", ru: "Что мы должны делать?" }, { de: "Helfen Sie mir bitte", ru: "Помогите мне" },
+                { de: "Wie geht's?", ru: "Как дела?" }, { de: "Wie geht es dir?", ru: "Как у тебя дела?" },
+                { de: "Wie geht es Ihnen?", ru: "Как у вас дела?" }, { de: "auf Wiedersehen", ru: "до свидания" },
+                { de: "der Tag", ru: "день" }, { de: "Guten Tag", ru: "добрый день" }, { de: "Guten Morgen", ru: "доброе утро" },
+                { de: "Guten Abend", ru: "добрый вечер" }, { de: "Gute Nacht", ru: "спокойной ночи" },
+                { de: "sehr gut", ru: "очень хорошо" }, { de: "gut", ru: "хорошо" }, { de: "es geht", ru: "нормально" },
+                { de: "nicht so gut", ru: "не очень хорошо" }, { de: "schlecht", ru: "плохо" }, { de: "danke", ru: "спасибо" },
+                { de: "tschüss", ru: "пока" }, { de: "weiter", ru: "дальше" }, { de: "die Begrüßung", ru: "приветствие" },
+                { de: "der Abschied", ru: "прощание" }, { de: "Verabschieden Sie sich", ru: "Попрощайтесь" },
+                { de: "die Kommunikation", ru: "коммуникация" }, { de: "die Persönlichkeit", ru: "личность" },
+                { de: "auf", ru: "на" }, { de: "aus", ru: "из" }, { de: "aber", ru: "но" }, { de: "kein", ru: "никакой" },
+                { de: "nicht", ru: "не" }
+            ]},
+            { id: 'u1_wfragen', title: 'W-Fragen', words: [
+                { de: "W-Fragen", ru: "Вопросы с W" }, { de: "Was?", ru: "Что?" }, { de: "Wo?", ru: "Где?" },
+                { de: "Wer?", ru: "Кто?" }, { de: "Woher?", ru: "Откуда?" }, { de: "Warum?", ru: "Почему?" },
+                { de: "Wie oft?", ru: "Как часто?" }, { de: "Wie?", ru: "Как?" }
+            ]}
+        ]},
+        { id: 'unit2', title: '📖 Юнит 2 (Lektion 2)', subs: [
+            { id: 'u2_prof_add', title: 'Профессии (доп.)', words: [
+                { de: "der Journalist", ru: "журналист" }, { de: "der Ingenieur", ru: "инженер" },
+                { de: "der Mechatroniker", ru: "механик" }, { de: "der Schauspieler", ru: "актер" }, { de: "der Student", ru: "студент" }
+            ]},
+            { id: 'u2_jobs_life', title: 'Профессии и Личное', words: [
+                { de: "der Friseur", ru: "парикмахер" }, { de: "der Architekt", ru: "архитектор" },
+                { de: "der Sekretär", ru: "секретарь" }, { de: "der Arzt", ru: "доктор" },
+                { de: "der Lehrer", ru: "учитель" }, { de: "der Verkäufer", ru: "продавец" },
+                { de: "der Kellner", ru: "официант" }, { de: "die Krankenschwester", ru: "медсестра" },
+                { de: "der Flugbegleiter", ru: "бортпроводник" }, { de: "der Rechtsanwalt", ru: "юрист" },
+                { de: "der Beruf", ru: "профессия" }, { de: "die Arbeit", ru: "работа" },
+                { de: "die Ausbildung", ru: "специальность" }, { de: "der Familienstand", ru: "Семейный статус" },
+                { de: "geschieden", ru: "разведенный" }, { de: "verheiratet", ru: "женат/замужем" },
+                { de: "zusammen", ru: "вместе" }, { de: "das Kind", ru: "ребенок" },
+                { de: "single", ru: "холостой" }, { de: "allein", ru: "один" }
+            ]},
+            { id: 'u2_verbs_actions', title: 'Глаголы и действия', words: [
+                { de: "studieren", ru: "учиться" }, { de: "verkaufen", ru: "продавать" },
+                { de: "erklären", ru: "объяснять" }, { de: "reparieren", ru: "чинить" },
+                { de: "spielen", ru: "играть" }, { de: "sortieren", ru: "сортировать" },
+                { de: "sprechen", ru: "говорить" }, { de: "helfen", ru: "помогать" },
+                { de: "montieren", ru: "чинить/монтировать" }, { de: "telefonieren", ru: "звонить" },
+                { de: "Interviews machen", ru: "брать интервью" }, { de: "Medikamente geben", ru: "давать лекарство" },
+                { de: "Texte schreiben", ru: "писать текст" }, { de: "am Computer arbeiten", ru: "работать на компьютере" },
+                { de: "lernen", ru: "изучать" }, { de: "bekommen", ru: "получать" },
+                { de: "reservieren", ru: "резервировать" }, { de: "gehören", ru: "принадлежать" },
+                { de: "erkennen", ru: "узнавать" }, { de: "beschreiben", ru: "описывать" },
+                { de: "diskutieren", ru: "обсуждать" }, { de: "wiederholen", ru: "повторять" },
+                { de: "gratulieren", ru: "поздравлять" }, { de: "danken", ru: "благодарить" },
+                { de: "verstehen", ru: "понимать" }, { de: "wissen", ru: "знать" },
+                { de: "fliegen", ru: "летать" }, { de: "verlieren", ru: "потерять" }
+            ]},
+            { id: 'u2_phrases_prep', title: 'Фразы и предлоги', words: [
+                { de: "die Visitenkarte", ru: "визитная карточка" }, { de: "das Krankenhaus", ru: "больница" },
+                { de: "die Entschuldigung", ru: "извинение" }, { de: "beruflich", ru: "по профессии" },
+                { de: "noch einmal", ru: "еще раз" }, { de: "der Wohnort", ru: "место жительства" },
+                { de: "auf", ru: "над" }, { de: "dann", ru: "потом" }, { de: "stehen", ru: "стоять" },
+                { de: "Ich arbeite als Lehrer", ru: "Я работаю как учитель" }, { de: "Ich bin Lehrer", ru: "Я учитель" },
+                { de: "Ich arbeite bei BMW", ru: "Я работаю в BMW" }, { de: "zu kompliziert", ru: "очень сложно" },
+                { de: "Er wohnt in Köln", ru: "Он живет в Кёльне" }, { de: "Er wohnt nicht in Köln", ru: "Он не живет в Кёльне" },
+                { de: "Sehen Sie das Foto an", ru: "Смотрите на фото" }, { de: "Die Frau auf dem Bild ist Herberts Mutter", ru: "Женщина на фото - мать Герберта" },
+                { de: "Ich lebe allein", ru: "Я живу один" }, { de: "Wir sind verheiratet", ru: "Мы женаты" },
+                { de: "Wir sind nicht verheiratet", ru: "Мы не женаты" }
+            ]}
+        ]},
+        { id: 'unit3', title: '📖 Юнит 3 (Lektion 3)', subs: [
+            { id: 'u3_family', title: 'Семья и родственники', words: [
+                { de: "das Familienmitglied", ru: "член семьи" }, { de: "der Vater", ru: "отец" },
+                { de: "die Mutter", ru: "мать" }, { de: "die Eltern", ru: "родители" },
+                { de: "der Sohn", ru: "сын" }, { de: "die Tochter", ru: "дочь" },
+                { de: "der Bruder", ru: "брат" }, { de: "die Schwester", ru: "сестра" },
+                { de: "die Geschwister", ru: "брат и сестра" }, { de: "der Großvater", ru: "дедушка" },
+                { de: "der Opa", ru: "дедушка" }, { de: "die Großmutter", ru: "бабушка" },
+                { de: "die Oma", ru: "бабушка" }, { de: "die Großeltern", ru: "бабушка и дедушка" },
+                { de: "die Enkelin", ru: "внучка" }, { de: "der Enkel", ru: "внук" },
+                { de: "der Ehemann", ru: "муж" }, { de: "die Ehefrau", ru: "жена" }
+            ]},
+            { id: 'u3_countries', title: 'Страны и регионы', words: [
+                { de: "Belgien", ru: "Бельгия" }, { de: "Dänemark", ru: "Дания" },
+                { de: "Frankreich", ru: "Франция" }, { de: "Italien", ru: "Италия" },
+                { de: "Liechtenstein", ru: "Лихтенштейн" }, { de: "Luxemburg", ru: "Люксембург" },
+                { de: "Niederlande", ru: "Нидерланды" }, { de: "Österreich", ru: "Австрия" },
+                { de: "Polen", ru: "Польша" }, { de: "die Schweiz", ru: "Швейцария" },
+                { de: "Slowakei", ru: "Словакия" }, { de: "Slowenien", ru: "Словения" },
+                { de: "Tschechien", ru: "Чехия" }, { de: "Ungarn", ru: "Венгрия" }, { de: "Deutschland", ru: "Германия" }
+            ]},
+            { id: 'u3_languages', title: 'Языки и национальности', words: [
+                { de: "die Fremdsprache", ru: "иностранный язык" }, { de: "die Sprachen", ru: "Языки" },
+                { de: "Deutsch", ru: "немецкий" }, { de: "Englisch", ru: "английский" },
+                { de: "Russisch", ru: "русский" }, { de: "Finnisch", ru: "финский" },
+                { de: "Luxemburgisch", ru: "люксембургский" }, { de: "Spanisch", ru: "испанский" },
+                { de: "Französisch", ru: "французский" }, { de: "Italienisch", ru: "итальянский" },
+                { de: "Rätoromanisch", ru: "ретороманский" }, { de: "Niederländisch", ru: "нидерландский" },
+                { de: "Polnisch", ru: "польский" }, { de: "Schwedisch", ru: "шведский" },
+                { de: "Slowakisch", ru: "словацкий" }, { de: "Slowenisch", ru: "словенский" },
+                { de: "Tschechisch", ru: "чешский" }, { de: "Ungarisch", ru: "венгерский" }
+            ]},
+            { id: 'u3_verbs_phrases', title: 'Глаголы и Фразы', words: [
+                { de: "selbst", ru: "сам" }, { de: "Drehbuchausschnitt", ru: "отрывок из сценария" },
+                { de: "der Wohnort", ru: "место жительства" }, { de: "der Zettel", ru: "записка" },
+                { de: "das Gebiet", ru: "район" }, { de: "farbig", ru: "цветной" },
+                { de: "die Hilfe", ru: "помощь" }, { de: "kochen", ru: "готовить" },
+                { de: "skaten", ru: "кататься на скейтборде" }, { de: "zurzeit", ru: "в данный момент" },
+                { de: "bald", ru: "скоро" }, { de: "fertig", ru: "готово" },
+                { de: "gehen", ru: "идти" }, { de: "zurück", ru: "назад" },
+                { de: "der Stammbaum", ru: "семейное дерево" }, { de: "der Chemiefacharbeiter", ru: "химический рабочий" },
+                { de: "mehr", ru: "больше" }, { de: "moderieren", ru: "вести, комментировать" },
+                { de: "bis", ru: "до" }, { de: "der Sänger", ru: "певец" },
+                { de: "wählen", ru: "выбирать" }, { de: "das Ergebnis", ru: "результат" },
+                { de: "die Länder", ru: "Страны" }, { de: "jetzt", ru: "сейчас" }
+            ]},
+            { id: 'u3_numbers', title: '🔢 Числа от 0 до 1 млн.', words: [
+                { de: "null", ru: "ноль" }, { de: "eins", ru: "один" }, { de: "zwei", ru: "два" },
+                { de: "drei", ru: "три" }, { de: "vier", ru: "четыре" }, { de: "fünf", ru: "пять" },
+                { de: "sechs", ru: "шесть" }, { de: "sieben", ru: "семь" }, { de: "acht", ru: "восемь" },
+                { de: "neun", ru: "девять" }, { de: "zehn", ru: "десять" }, { de: "elf", ru: "одиннадцать" },
+                { de: "zwölf", ru: "двенадцать" }, { de: "dreizehn", ru: "тринадцать" },
+                { de: "vierzehn", ru: "четырнадцать" }, { de: "fünfzehn", ru: "пятнадцать" },
+                { de: "sechzehn", ru: "шестнадцать" }, { de: "siebzehn", ru: "семнадцать" },
+                { de: "achtzehn", ru: "восемнадцать" }, { de: "neunzehn", ru: "девятнадцать" },
+                { de: "zwanzig", ru: "двадцать" }, { de: "dreißig", ru: "тридцать" },
+                { de: "vierzig", ru: "сорок" }, { de: "fünfzig", ru: "пятьдесят" },
+                { de: "sechzig", ru: "шестьдесят" }, { de: "siebzig", ru: "семьдесят" },
+                { de: "achtzig", ru: "восемьдесят" }, { de: "neunzig", ru: "девяносто" },
+                { de: "einhundert", ru: "сто" }, { de: "tausend", ru: "тысяча" },
+                { de: "zehntausend", ru: "десять тысяч" }, { de: "hunderttausend", ru: "сто тысяч" },
+                { de: "eine Million", ru: "один миллион" }, { de: "fünfundzwanzig", ru: "двадцать пять" }
+            ]}
+        ]},
+        { id: 'unit4', title: '📖 Юнит 4 (Базовые знания)', subs: [
+            { id: 'u4_nouns', title: 'Существительные (Nomen)', words: [
+                { de: "der Tisch", ru: "стол" }, { de: "der Stuhl", ru: "стул" }, { de: "der Stift", ru: "карандаш" },
+                { de: "der Computer", ru: "компьютер" }, { de: "der Wagen", ru: "машина" }, { de: "der Mensch", ru: "человек" },
+                { de: "der Buchstabe", ru: "буква" }, { de: "der Brief", ru: "письмо" }, { de: "der Text", ru: "текст" },
+                { de: "der Satz", ru: "предложение" }, { de: "der Tag", ru: "день" }, { de: "der Arbeitgeber", ru: "работодатель" },
+                { de: "der Beruf", ru: "профессия" }, { de: "der Job", ru: "работа" }, { de: "der Architekt", ru: "архитектор" },
+                { de: "der Arzt", ru: "врач" }, { de: "der Friseur", ru: "парикмахер" }, { de: "der Ingenieur", ru: "инженер" },
+                { de: "der Journalist", ru: "журналист" }, { de: "der Kellner", ru: "официант" }, { de: "der Lehrer", ru: "учитель" },
+                { de: "der Student", ru: "студент" }, { de: "der Schauspieler", ru: "актер" }, { de: "der Schüler", ru: "ученик" },
+                { de: "der Sekretär", ru: "секретарь" }, { de: "der Verkäufer", ru: "продавец" }, { de: "der Familienstand", ru: "семейное положение" },
+                { de: "der Wohnort", ru: "место жительства" }, { de: "der Vater", ru: "отец" }, { de: "der Sohn", ru: "сын" },
+                { de: "der Bruder", ru: "брат" }, { de: "der Großvater", ru: "дедушка" }, { de: "der Opa", ru: "дедушка" },
+                { de: "der Enkel", ru: "внук" }, { de: "der Ehemann", ru: "муж" }, { de: "der Zettel", ru: "записка" },
+                { de: "der Stammbaum", ru: "семейное дерево" }, { de: "der Sänger", ru: "певец" }, 
+                { de: "der Chemiefacharbeiter", ru: "химический рабочий" }, { de: "der Flugbegleiter", ru: "бортпроводник" },
+                { de: "der Rechtsanwalt", ru: "юрист" },
+                { de: "die Lampe", ru: "лампа" }, { de: "die Tasche", ru: "сумка" }, { de: "die Blume", ru: "цветок" },
+                { de: "die Vase", ru: "ваза" }, { de: "die Straße", ru: "улица" }, { de: "die Übung", ru: "упражнение" },
+                { de: "die Zeitung", ru: "газета" }, { de: "die Zeitschrift", ru: "журнал" }, { de: "die Zahl", ru: "цифра" },
+                { de: "die Gruppe", ru: "группа" }, { de: "die Partnerin", ru: "партнерша" }, { de: "die Tabelle", ru: "таблица" },
+                { de: "die Kursleiterin", ru: "руководитель курса" }, { de: "die Schule", ru: "школа" }, 
+                { de: "die Stelle", ru: "должность" }, { de: "die Krankenschwester", ru: "медсестра" }, 
+                { de: "die Visitenkarte", ru: "визитка" }, { de: "die Entschuldigung", ru: "извинение" },
+                { de: "die Mutter", ru: "мать" }, { de: "die Tochter", ru: "дочь" }, { de: "die Schwester", ru: "сестра" },
+                { de: "die Großmutter", ru: "бабушка" }, { de: "die Oma", ru: "бабушка" }, { de: "die Enkelin", ru: "внучка" },
+                { de: "die Ehefrau", ru: "жена" }, { de: "die Fremdsprache", ru: "иностранный язык" },
+                { de: "die Schweiz", ru: "Швейцария" }, { de: "die Hilfe", ru: "помощь" }, { de: "die Arbeit", ru: "работа" },
+                { de: "die Ausbildung", ru: "специальность" }, { de: "die Türkei", ru: "Турция" }, { de: "die Slowakei", ru: "Словакия" },
+                { de: "das Buch", ru: "книга" }, { de: "das Bild", ru: "картина" }, { de: "das Wort", ru: "слово" },
+                { de: "das Haus", ru: "дом" }, { de: "das Zimmer", ru: "комната" }, { de: "das Kind", ru: "ребенок" },
+                { de: "das Mädchen", ru: "девочка" }, { de: "das Spielzeug", ru: "игрушка" }, 
+                { de: "das Gespräch", ru: "разговор" }, { de: "das Foto", ru: "фотография" },
+                { de: "das Alter", ru: "возраст" }, { de: "das Jahr", ru: "год" }, { de: "das Praktikum", ru: "практика" },
+                { de: "das Krankenhaus", ru: "больница" }, { de: "das Familienmitglied", ru: "член семьи" },
+                { de: "das Gebiet", ru: "район" }, { de: "das Ergebnis", ru: "результат" }, { de: "das Belgien", ru: "Бельгия" },
+                { de: "das Dänemark", ru: "Дания" }, { de: "das Frankreich", ru: "Франция" }, { de: "das Italien", ru: "Италия" },
+                { de: "das Liechtenstein", ru: "Лихтенштейн" }, { de: "das Luxemburg", ru: "Люксембург" }, 
+                { de: "das Österreich", ru: "Австрия" }, { de: "das Polen", ru: "Польша" }, { de: "das Slowenien", ru: "Словения" },
+                { de: "das Tschechien", ru: "Чехия" }, { de: "das Ungarn", ru: "Венгрия" }
+            ]},
+            { id: 'u4_adjectives', title: 'Прилагательные (Adjektive)', words: [
+                { de: "gut", ru: "хороший" }, { de: "schlecht", ru: "плохой" },
+                { de: "richtig", ru: "правильный" }, { de: "falsch", ru: "неправильный" },
+                { de: "super", ru: "суперский" }, { de: "farbig", ru: "цветной" },
+                { de: "beruflich", ru: "профессиональный" }, { de: "fertig", ru: "готовый" },
+                { de: "verheiratet", ru: "женатый/замужняя" }, { de: "geschieden", ru: "разведенный" },
+                { de: "kompliziert", ru: "сложный" }, { de: "allein", ru: "одинокий / один" },
+                { de: "selbst", ru: "сам" }, { de: "mehr", ru: "больше" }, { de: "bald", ru: "скоро" },
+                { de: "zurzeit", ru: "в данный момент" }, { de: "single", ru: "холостой" },
+                { de: "arbeitslos", ru: "безработный" }
+            ]},
+            { id: 'u4_verbs', title: 'Глаголы (Verben)', words: [
+                { de: "kommen", ru: "приходить" }, { de: "heißen", ru: "называться" },
+                { de: "vergleichen", ru: "сравнивать" }, { de: "üben", ru: "упражняться" },
+                { de: "arbeiten", ru: "работать" }, { de: "studieren", ru: "учиться" },
+                { de: "leben", ru: "жить" }, { de: "wohnen", ru: "проживать" },
+                { de: "glauben", ru: "верить" }, { de: "haben", ru: "иметь" },
+                { de: "machen", ru: "делать" }, { de: "sprechen", ru: "говорить" },
+                { de: "schreiben", ru: "писать" }, { de: "lesen", ru: "читать" },
+                { de: "hören", ru: "слушать" }, { de: "fragen", ru: "спрашивать" },
+                { de: "antworten", ru: "отвечать" }, { de: "zeigen", ru: "показывать" },
+                { de: "ergänzen", ru: "заполнять" }, { de: "kreuzen", ru: "отмечать крестом" },
+                { de: "ordnen", ru: "упорядочивать" }, { de: "markieren", ru: "отмечать" },
+                { de: "zeichnen", ru: "рисовать" }, { de: "verstehen", ru: "понимать" },
+                { de: "helfen", ru: "помогать" }, { de: "telefonieren", ru: "звонить" },
+                { de: "sortieren", ru: "сортировать" }, { de: "reparieren", ru: "чинить" },
+                { de: "erklären", ru: "объяснять" }, { de: "spielen", ru: "играть" },
+                { de: "montieren", ru: "монтировать" }, { de: "beschreiben", ru: "описывать" },
+                { de: "diskutieren", ru: "обсуждать" }, { de: "wiederholen", ru: "повторять" },
+                { de: "gratulieren", ru: "поздравлять" }, { de: "danken", ru: "благодарить" },
+                { de: "wissen", ru: "знать" }, { de: "fliegen", ru: "летать" },
+                { de: "verlieren", ru: "терять" }, { de: "bekommen", ru: "получать" },
+                { de: "reservieren", ru: "резервировать" }, { de: "gehören", ru: "принадлежать" },
+                { de: "erkennen", ru: "узнавать" }, { de: "gehen", ru: "идти" },
+                { de: "kochen", ru: "готовить" }, { de: "skaten", ru: "кататься на скейте" },
+                { de: "moderieren", ru: "вести (программу)" }, { de: "wählen", ru: "выбирать" },
+                { de: "stehen", ru: "стоять" }, { de: "lernen", ru: "изучать" },
+                { de: "verkaufen", ru: "продавать" }, { de: "sehen", ru: "смотреть" },
+                { de: "ankreuzen", ru: "отметить галочкой" }
+            ]}
+        ]},
+        { id: 'unit5', title: '📖 Юнит 5 (Существительные по родам)', subs: [
+            { id: 'u5_der', title: 'Мужской род (der)', words: [
+                { de: "der Tisch", ru: "стол" }, { de: "der Stuhl", ru: "стул" }, { de: "der Stift", ru: "карандаш" },
+                { de: "der Computer", ru: "компьютер" }, { de: "der Wagen", ru: "машина" }, { de: "der Mensch", ru: "человек" },
+                { de: "der Buchstabe", ru: "буква" }, { de: "der Brief", ru: "письмо" }, { de: "der Text", ru: "текст" },
+                { de: "der Satz", ru: "предложение" }, { de: "der Tag", ru: "день" }, { de: "der Arbeitgeber", ru: "работодатель" },
+                { de: "der Beruf", ru: "профессия" }, { de: "der Job", ru: "работа" }, { de: "der Architekt", ru: "архитектор" },
+                { de: "der Arzt", ru: "врач" }, { de: "der Friseur", ru: "парикмахер" }, { de: "der Ingenieur", ru: "инженер" },
+                { de: "der Journalist", ru: "журналист" }, { de: "der Kellner", ru: "официант" }, { de: "der Lehrer", ru: "учитель" },
+                { de: "der Student", ru: "студент" }, { de: "der Schauspieler", ru: "актер" }, { de: "der Schüler", ru: "ученик" },
+                { de: "der Sekretär", ru: "секретарь" }, { de: "der Verkäufer", ru: "продавец" }, { de: "der Familienstand", ru: "семейное положение" },
+                { de: "der Wohnort", ru: "место жительства" }, { de: "der Vater", ru: "отец" }, { de: "der Sohn", ru: "сын" },
+                { de: "der Bruder", ru: "брат" }, { de: "der Großvater", ru: "дедушка" }, { de: "der Opa", ru: "дедушка" },
+                { de: "der Enkel", ru: "внук" }, { de: "der Ehemann", ru: "муж" }, { de: "der Zettel", ru: "записка" },
+                { de: "der Stammbaum", ru: "семейное дерево" }, { de: "der Sänger", ru: "певец" }, 
+                { de: "der Chemiefacharbeiter", ru: "химический рабочий" }, { de: "der Flugbegleiter", ru: "бортпроводник" },
+                { de: "der Rechtsanwalt", ru: "юрист" }
+            ]},
+            { id: 'u5_die', title: 'Женский род (die)', words: [
+                { de: "die Lampe", ru: "лампа" }, { de: "die Tasche", ru: "сумка" }, { de: "die Blume", ru: "цветок" },
+                { de: "die Vase", ru: "ваза" }, { de: "die Straße", ru: "улица" }, { de: "die Übung", ru: "упражнение" },
+                { de: "die Zeitung", ru: "газета" }, { de: "die Zeitschrift", ru: "журнал" }, { de: "die Zahl", ru: "цифра" },
+                { de: "die Gruppe", ru: "группа" }, { de: "die Partnerin", ru: "партнерша" }, { de: "die Tabelle", ru: "таблица" },
+                { de: "die Kursleiterin", ru: "руководитель курса" }, { de: "die Schule", ru: "школа" }, 
+                { de: "die Stelle", ru: "должность" }, { de: "die Krankenschwester", ru: "медсестра" }, 
+                { de: "die Visitenkarte", ru: "визитка" }, { de: "die Entschuldigung", ru: "извинение" },
+                { de: "die Mutter", ru: "мать" }, { de: "die Tochter", ru: "дочь" }, { de: "die Schwester", ru: "сестра" },
+                { de: "die Großmutter", ru: "бабушка" }, { de: "die Oma", ru: "бабушка" }, { de: "die Enkelin", ru: "внучка" },
+                { de: "die Ehefrau", ru: "жена" }, { de: "die Fremdsprache", ru: "иностранный язык" },
+                { de: "die Schweiz", ru: "Швейцария" }, { de: "die Hilfe", ru: "помощь" }, { de: "die Arbeit", ru: "работа" },
+                { de: "die Ausbildung", ru: "специальность" }, { de: "die Türkei", ru: "Турция" }, { de: "die Slowakei", ru: "Словакия" }
+            ]},
+            { id: 'u5_das', title: 'Средний род (das)', words: [
+                { de: "das Buch", ru: "книга" }, { de: "das Bild", ru: "картина" }, { de: "das Wort", ru: "слово" },
+                { de: "das Haus", ru: "дом" }, { de: "das Zimmer", ru: "комната" }, { de: "das Kind", ru: "ребенок" },
+                { de: "das Mädchen", ru: "девочка" }, { de: "das Spielzeug", ru: "игрушка" }, 
+                { de: "das Gespräch", ru: "разговор" }, { de: "das Foto", ru: "фотография" },
+                { de: "das Alter", ru: "возраст" }, { de: "das Jahr", ru: "год" }, { de: "das Praktikum", ru: "практика" },
+                { de: "das Krankenhaus", ru: "больница" }, { de: "das Familienmitglied", ru: "член семьи" },
+                { de: "das Gebiet", ru: "район" }, { de: "das Ergebnis", ru: "результат" }, { de: "das Belgien", ru: "Бельгия" },
+                { de: "das Dänemark", ru: "Дания" }, { de: "das Frankreich", ru: "Франция" }, { de: "das Italien", ru: "Италия" },
+                { de: "das Liechtenstein", ru: "Лихтенштейн" }, { de: "das Luxemburg", ru: "Люксембург" }, 
+                { de: "das Österreich", ru: "Австрия" }, { de: "das Polen", ru: "Польша" }, { de: "das Slowenien", ru: "Словения" },
+                { de: "das Tschechien", ru: "Чехия" }, { de: "das Ungarn", ru: "Венгрия" }
+            ]},
+            { id: 'u5_plural', title: 'Множественное число (die)', words: [
+                { de: "die Geschwister", ru: "братья и сестры" }, 
+                { de: "die Großeltern", ru: "бабушка и дедушка" }, 
+                { de: "die Länder", ru: "страны" }, 
+                { de: "die Niederlande", ru: "Нидерланды" }, 
+                { de: "die Eltern", ru: "родители" },
+                { de: "die Sprachen", ru: "языки" },
+                { de: "die Kinder", ru: "дети" }
+            ]}
+        ]},
+        { id: 'unit6', title: '📖 Юнит 6 (Глаголы: Спряжение)', subs: [
+            { id: 'u6_verbs_conjugation', title: 'Базовые глаголы (A1)', words: [
+                { de: "kommen", ru: "приходить", conjugation: { ich: "komme", du: "kommst", er: "kommt", wir: "kommen", ihr: "kommt", sie: "kommen" } },
+                { de: "arbeiten", ru: "работать", conjugation: { ich: "arbeite", du: "arbeitest", er: "arbeitet", wir: "arbeiten", ihr: "arbeitet", sie: "arbeiten" } },
+                { de: "haben", ru: "иметь", conjugation: { ich: "habe", du: "hast", er: "hat", wir: "haben", ihr: "habt", sie: "haben" } },
+                { de: "sein", ru: "быть", conjugation: { ich: "bin", du: "bist", er: "ist", wir: "sind", ihr: "seid", sie: "sind" } },
+                { de: "gehen", ru: "идти", conjugation: { ich: "gehe", du: "gehst", er: "geht", wir: "gehen", ihr: "geht", sie: "gehen" } },
+                { de: "sprechen", ru: "говорить", conjugation: { ich: "spreche", du: "sprichst", er: "spricht", wir: "sprechen", ihr: "sprecht", sie: "sprechen" } },
+                { de: "sehen", ru: "видеть / смотреть", conjugation: { ich: "sehe", du: "siehst", er: "sieht", wir: "sehen", ihr: "seht", sie: "sehen" } },
+                { de: "nehmen", ru: "брать", conjugation: { ich: "nehme", du: "nimmst", er: "nimmt", wir: "nehmen", ihr: "nehmt", sie: "nehmen" } },
+                { de: "geben", ru: "давать", conjugation: { ich: "gebe", du: "gibst", er: "gibt", wir: "geben", ihr: "gebt", sie: "geben" } },
+                { de: "lesen", ru: "читать", conjugation: { ich: "lese", du: "liest", er: "liest", wir: "lesen", ihr: "lest", sie: "lesen" } },
+                { de: "essen", ru: "есть", conjugation: { ich: "esse", du: "isst", er: "isst", wir: "essen", ihr: "esst", sie: "essen" } },
+                { de: "wissen", ru: "знать", conjugation: { ich: "weiß", du: "weißt", er: "weiß", wir: "wissen", ihr: "wisst", sie: "wissen" } },
+                { de: "können", ru: "мочь (уметь)", conjugation: { ich: "kann", du: "kannst", er: "kann", wir: "können", ihr: "könnt", sie: "können" } },
+                { de: "müssen", ru: "быть должным", conjugation: { ich: "muss", du: "musst", er: "muss", wir: "müssen", ihr: "müsst", sie: "müssen" } },
+                { de: "wollen", ru: "хотеть", conjugation: { ich: "will", du: "willst", er: "will", wir: "wollen", ihr: "wollt", sie: "wollen" } },
+                { de: "rufen", ru: "звать / кричать", conjugation: { ich: "rufe", du: "rufst", er: "ruft", wir: "rufen", ihr: "ruft", sie: "rufen" } },
+                { de: "anrufen", ru: "звонить (по телефону)", conjugation: { ich: "rufe an", du: "rufst an", er: "ruft an", wir: "rufen an", ihr: "ruft an", sie: "rufen an" } },
+                { de: "heißen", ru: "называться", conjugation: { ich: "heiße", du: "heißt", er: "heißt", wir: "heißen", ihr: "heißt", sie: "heißen" } },
+                { de: "machen", ru: "делать", conjugation: { ich: "mache", du: "machst", er: "macht", wir: "machen", ihr: "macht", sie: "machen" } },
+                { de: "wohnen", ru: "проживать", conjugation: { ich: "wohne", du: "wohnst", er: "wohnt", wir: "wohnen", ihr: "wohnt", sie: "wohnen" } },
+                { de: "studieren", ru: "учиться в вузе", conjugation: { ich: "studiere", du: "studierts", er: "studiert", wir: "studieren", ihr: "studiert", sie: "studieren" } },
+                { de: "schreiben", ru: "писать", conjugation: { ich: "schreibe", du: "schreibst", er: "schreibt", wir: "schreiben", ihr: "schreibt", sie: "schreiben" } },
+                { de: "helfen", ru: "помогать", conjugation: { ich: "helfe", du: "hilfst", er: "hilft", wir: "helfen", ihr: "helft", sie: "helfen" } },
+                { de: "trinken", ru: "пить", conjugation: { ich: "trinke", du: "trinkst", er: "trinkt", wir: "trinken", ihr: "trinkt", sie: "trinken" } },
+                { de: "fahren", ru: "ехать", conjugation: { ich: "fahre", du: "fährst", er: "fährt", wir: "fahren", ihr: "fahrt", sie: "fahren" } },
+                { de: "schlafen", ru: "спать", conjugation: { ich: "schlafe", du: "schläfst", er: "schläft", wir: "schlafen", ihr: "schlaft", sie: "schlafen" } },
+                { de: "laufen", ru: "бежать / идти пешком", conjugation: { ich: "laufe", du: "läufst", er: "läuft", wir: "laufen", ihr: "lauft", sie: "laufen" } },
+                { de: "ziehen", ru: "тянуть / переезжать", conjugation: { ich: "ziehe", du: "ziehst", er: "zieht", wir: "ziehen", ihr: "zieht", sie: "ziehen" } },
+                { de: "fliegen", ru: "летать", conjugation: { ich: "fliege", du: "fliegst", er: "fliegt", wir: "fliegen", ihr: "fliegt", sie: "fliegen" } },
+                { de: "waschen", ru: "мыть / стирать", conjugation: { ich: "wasche", du: "wäschst", er: "wäscht", wir: "waschen", ihr: "wascht", sie: "waschen" } }
+            ]}
+        ]}
     ];
 
-    // --- КРЕАТИВНЫЕ СООБЩЕНИЯ ---
     const reactions = {
         wrong: [
             "🐒🖕 Неправильно! Обезьянка показывает тебе средний палец.",
@@ -827,7 +707,6 @@
         ]
     };
 
-    // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И СОХРАНЕНИЕ ---
     let currentUnitId = null;
     let currentSubId = null;
     let currentQuestions = [];
@@ -835,6 +714,26 @@
     let score = 0;
     let currentMode = 'train';
     let currentPronoun = '';
+    let currentRenameType = '';
+    let currentRenameId = '';
+
+    function loadNames() {
+        const namesData = localStorage.getItem('assistentNames');
+        if (namesData) return JSON.parse(namesData);
+        return {};
+    }
+    function saveNames(namesObj) {
+        localStorage.setItem('assistentNames', JSON.stringify(namesObj));
+    }
+
+    function loadSettings() {
+        const sets = localStorage.getItem('assistentSettings');
+        if (sets) return JSON.parse(sets);
+        return { shuffleQuestions: true, shuffleAnswers: false, favOnly: false };
+    }
+    function saveSettingsToLocal(sets) {
+        localStorage.setItem('assistentSettings', JSON.stringify(sets));
+    }
 
     function loadFavorites() {
         const favData = localStorage.getItem('assistentFavorites');
@@ -861,7 +760,6 @@
         }
     }
 
-    // --- ОЗВУЧКА (ГОЛОСОВОЕ ПРОИЗНОШЕНИЕ) ---
     function speakGerman(text) {
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(text);
@@ -873,17 +771,19 @@
         }
     }
 
-    // --- ОТРИСОВКА МЕНЮ ---
     function renderUnits() {
+        const names = loadNames();
         const list = document.getElementById('unitList');
         list.innerHTML = '';
         units.forEach(unit => {
+            let title = unit.title;
+            if (names[unit.id]) title = names[unit.id];
             const card = document.createElement('div');
             card.className = 'unit-card';
             let totalWords = 0;
             unit.subs.forEach(s => totalWords += s.words.length);
             card.innerHTML = `
-                <div class="title">${unit.title}</div>
+                <div class="title">${title}</div>
                 <div class="unit-stats">
                     <span class="stat-pill">❓ ${totalWords}</span>
                     <span class="stat-pill">📂 ${unit.subs.length} подгруппы</span>
@@ -898,16 +798,17 @@
         currentUnitId = unitId;
         document.getElementById('menuScreen').style.display = 'none';
         document.getElementById('subMenuScreen').style.display = 'block';
-        
         const unit = units.find(u => u.id === unitId);
+        const names = loadNames();
         const list = document.getElementById('subList');
         list.innerHTML = '';
-
         unit.subs.forEach(sub => {
+            let title = sub.title;
+            if (names[sub.id]) title = names[sub.id];
             const card = document.createElement('div');
             card.className = 'sub-card';
             card.innerHTML = `
-                <div class="sub-title">${sub.title}</div>
+                <div class="sub-title">${title}</div>
                 <div class="sub-stats">
                     <span class="stat-pill">❓ ${sub.words.length}</span>
                 </div>
@@ -935,11 +836,56 @@
     }
     function closeActionMenu() { document.getElementById('actionMenu').style.display = 'none'; }
 
+    function openRenameModal() {
+        closeActionMenu();
+        const names = loadNames();
+        currentRenameType = 'sub';
+        currentRenameId = currentSubId;
+        const input = document.getElementById('renameInput');
+        input.value = names[currentRenameId] || '';
+        document.getElementById('renameModal').style.display = 'flex';
+    }
+    function closeRename() {
+        document.getElementById('renameModal').style.display = 'none';
+    }
+    function saveRename() {
+        const input = document.getElementById('renameInput');
+        const newName = input.value.trim();
+        if (newName === '') {
+            alert("Введи название!");
+            return;
+        }
+        const names = loadNames();
+        names[currentRenameId] = newName;
+        saveNames(names);
+        closeRename();
+        openSubMenu(currentUnitId);
+    }
+
+    function openSettings() { 
+        const settings = loadSettings();
+        document.getElementById('shuffleQuestions').checked = settings.shuffleQuestions;
+        document.getElementById('shuffleAnswers').checked = settings.shuffleAnswers;
+        document.getElementById('favOnly').checked = settings.favOnly;
+        document.getElementById('settingsModal').style.display = 'flex'; 
+    }
+    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+    function saveSettings() {
+        const settings = {
+            shuffleQuestions: document.getElementById('shuffleQuestions').checked,
+            shuffleAnswers: document.getElementById('shuffleAnswers').checked,
+            favOnly: document.getElementById('favOnly').checked
+        };
+        saveSettingsToLocal(settings);
+        closeSettings();
+        if (currentQuestions.length > 0) {
+            startGame(currentQuestions, currentMode, settings.shuffleQuestions);
+        }
+    }
+
     function startUnit(type) {
         closeActionMenu();
         let subWords = [];
-        
-        // Режим "Повтор ошибок"
         if (type === 'mistakes') {
             const mistakesList = loadMistakes();
             if (mistakesList.length === 0) {
@@ -970,6 +916,15 @@
             return { ...w, fav: isFav };
         });
 
+        const settings = loadSettings();
+        if (settings.favOnly) {
+            pool = pool.filter(w => w.fav);
+            if (pool.length === 0) {
+                alert("Нет избранных вопросов в этой подгруппе! Добавь слова в избранное или выключи этот фильтр.");
+                return;
+            }
+        }
+
         const savedData = localStorage.getItem('assistentProgress');
         if (savedData && type !== 'mistakes') {
             try {
@@ -981,7 +936,7 @@
                 }
             } catch(e) {}
         }
-        startGame(pool, type);
+        startGame(pool, type, settings.shuffleQuestions);
     }
 
     function startGame(pool, type, shuffle = true) {
@@ -989,7 +944,6 @@
         currentIndex = 0;
         score = 0;
         currentMode = type;
-
         document.getElementById('subMenuScreen').style.display = 'none';
         document.getElementById('resultScreen').style.display = 'none';
         document.getElementById('quizScreen').style.display = 'block';
@@ -1005,7 +959,6 @@
         currentIndex = data.index;
         score = data.score;
         currentMode = data.mode;
-
         document.getElementById('subMenuScreen').style.display = 'none';
         document.getElementById('resultScreen').style.display = 'none';
         document.getElementById('quizScreen').style.display = 'block';
@@ -1017,16 +970,15 @@
         document.getElementById('resumeModal').style.display = 'none';
         localStorage.removeItem('assistentProgress');
         const data = window.pendingGame;
-        startGame(data.pool, data.type);
+        const settings = loadSettings();
+        startGame(data.pool, data.type, settings.shuffleQuestions);
     }
 
-    // --- ОТРИСОВКА ВОПРОСА ---
     function renderQuestion() {
         if (currentIndex >= currentQuestions.length) {
             showResult();
             return;
         }
-
         const saveData = { subId: currentSubId, mode: currentMode, index: currentIndex, score: score };
         localStorage.setItem('assistentProgress', JSON.stringify(saveData));
 
@@ -1043,32 +995,25 @@
         const writeMode = document.getElementById('writeMode');
         const conjugationMode = document.getElementById('conjugationMode');
 
-        // --- РЕЖИМ СПРЯЖЕНИЯ ---
         if (currentMode === 'conjugation') {
             optionsContainer.style.display = 'none';
             writeMode.style.display = 'none';
             conjugationMode.style.display = 'block';
-            
             const pronouns = ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'sie/Sie'];
             const pronounMap = ['ich', 'du', 'er', 'wir', 'ihr', 'sie'];
             const randomIndex = Math.floor(Math.random() * pronouns.length);
             currentPronoun = pronounMap[randomIndex];
-            
             document.getElementById('questionText').innerText = `Спрягай глагол "${q.de}" для местоимения "${pronouns[randomIndex]}"`;
-            
             const input = document.getElementById('conjInput');
             input.value = ''; input.className = 'write-input';
             document.getElementById('conjFeedback').className = 'write-feedback';
             document.getElementById('conjFeedback').style.display = 'none';
             document.getElementById('conjCheckBtn').style.display = 'block';
             input.disabled = false; input.focus();
-        } 
-        // --- ОБЫЧНЫЕ РЕЖИМЫ ---
-        else {
+        } else {
             optionsContainer.style.display = 'block';
             writeMode.style.display = 'none';
             conjugationMode.style.display = 'none';
-            
             document.getElementById('questionText').innerText = q.ru;
 
             if (currentMode === 'schreiben') {
@@ -1085,8 +1030,10 @@
                 let options = [q.de];
                 let wrongOptions = currentQuestions.filter(w => w.de !== q.de).sort(() => Math.random() - 0.5).slice(0, 3);
                 options = options.concat(wrongOptions.map(w => w.de));
-                options = options.sort(() => Math.random() - 0.5);
-
+                const settings = loadSettings();
+                if (settings.shuffleAnswers) {
+                    options = options.sort(() => Math.random() - 0.5);
+                }
                 options.forEach(opt => {
                     const btn = document.createElement('button');
                     btn.className = 'option-btn';
@@ -1098,15 +1045,12 @@
         }
     }
 
-    // --- ПРОВЕРКА ОБЫЧНЫХ ОТВЕТОВ ---
     function checkAnswer(selected, btnElement, correctAnswer) {
         const allBtns = document.querySelectorAll('.option-btn');
         allBtns.forEach(btn => btn.disabled = true);
-        
         let feedbackDiv = document.getElementById('optionsContainer');
         let oldMsg = document.getElementById('reactionMsg');
         if (oldMsg) oldMsg.remove();
-
         const q = currentQuestions[currentIndex];
         const msgBox = document.createElement('div');
         msgBox.id = 'reactionMsg';
@@ -1127,7 +1071,6 @@
             btnElement.classList.add('wrong');
             addMistake(q.de);
             allBtns.forEach(btn => { if(btn.innerText === correctAnswer) btn.classList.add('correct'); });
-            
             const randomWrong = reactions.wrong[Math.floor(Math.random() * reactions.wrong.length)];
             msgBox.style.background = '#f8d7da';
             msgBox.style.color = '#721c24';
@@ -1137,18 +1080,15 @@
                 <button class="speaker-btn" onclick="speakGerman('${correctAnswer.replace(/'/g, "\\'")}')">🔊</button>
             `;
         }
-
         feedbackDiv.appendChild(msgBox);
         document.getElementById('nextBtn').style.display = 'block';
     }
 
-    // --- ПРОВЕРКА ОТВЕТОВ В РЕЖИМЕ ШРАЙБЕН ---
     function checkWriteAnswer() {
         const q = currentQuestions[currentIndex];
         const input = document.getElementById('writeInput');
         const feedback = document.getElementById('writeFeedback');
         const checkBtn = document.getElementById('writeCheckBtn');
-
         let userAnswer = input.value.trim();
         let correctAnswer = q.de;
         input.disabled = true;
@@ -1165,7 +1105,6 @@
             input.className = 'write-input wrong';
             feedback.className = 'write-feedback wrong';
             addMistake(q.de);
-
             const randomWrong = reactions.wrong[Math.floor(Math.random() * reactions.wrong.length)];
             feedback.innerHTML = `
                 ❌ ${randomWrong}<br><br>
@@ -1177,16 +1116,13 @@
         document.getElementById('nextBtn').style.display = 'block';
     }
 
-    // --- ПРОВЕРКА ОТВЕТОВ В РЕЖИМЕ СПРЯЖЕНИЯ ---
     function checkConjugationAnswer() {
         const q = currentQuestions[currentIndex];
         const input = document.getElementById('conjInput');
         const feedback = document.getElementById('conjFeedback');
         const checkBtn = document.getElementById('conjCheckBtn');
-
         let userAnswer = input.value.trim().toLowerCase();
         let correctAnswer = q.conjugation[currentPronoun].toLowerCase();
-
         input.disabled = true;
         checkBtn.style.display = 'none';
 
@@ -1201,7 +1137,6 @@
             input.className = 'write-input wrong';
             feedback.className = 'write-feedback wrong';
             addMistake(q.de + " (" + currentPronoun + ")");
-
             const randomWrong = reactions.wrong[Math.floor(Math.random() * reactions.wrong.length)];
             feedback.innerHTML = `
                 ❌ ${randomWrong}<br><br>
@@ -1244,24 +1179,11 @@
         renderUnits();
     }
 
-    function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
-    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-
-    function startFromSettings() {
-        const shuffle = document.getElementById('shuffleCheck').checked;
-        closeSettings();
-        if (currentQuestions.length > 0) {
-            if(shuffle) currentQuestions.sort(() => Math.random() - 0.5);
-            startGame(currentQuestions, currentMode, shuffle);
-        }
-    }
-
-    // Слушатель для Enter в режиме спряжения
-    document.getElementById('conjInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkConjugationAnswer();
-    });
     document.getElementById('writeInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') checkWriteAnswer();
+    });
+    document.getElementById('conjInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') checkConjugationAnswer();
     });
 
     renderUnits();
