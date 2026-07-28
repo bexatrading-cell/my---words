@@ -8,234 +8,118 @@
         :root {
             --primary: #48c9b0;
             --bg: #f2f5f8;
+            --yellow: #FFDE00;
+            --black: #111111;
         }
-        * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, sans-serif;
-            background: var(--bg);
-            margin: 0;
-            padding: 20px 15px;
-            display: flex;
-            justify-content: center;
-        }
-        .app {
-            max-width: 450px;
-            width: 100%;
-        }
+        * { box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg); margin: 0; padding: 20px 15px; display: flex; justify-content: center; }
+        .app { max-width: 450px; width: 100%; }
         
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 15px;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; }
         .header h1 { margin: 0; font-size: 24px; color: #222; }
         .header-icons { font-size: 22px; color: #444; cursor: pointer; }
 
-        .unit-card {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 1px solid #eef2f6;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .unit-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #eef2f6; cursor: pointer; transition: 0.2s; }
         .unit-card:hover { transform: translateY(-2px); }
-        .unit-card .title {
-            font-size: 17px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #2c3e50;
-        }
+        .unit-card .title { font-size: 17px; font-weight: 600; margin-bottom: 12px; color: #2c3e50; }
         .unit-stats { display: flex; gap: 8px; flex-wrap: wrap; }
-        .stat-pill {
-            background: #f0f4f8;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #555;
-            border: 1px solid #e6eaef;
-        }
+        .stat-pill { background: #f0f4f8; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #555; border: 1px solid #e6eaef; }
 
         #subMenuScreen { display: none; }
-        .back-btn {
-            background: none; border: none; font-size: 18px; 
-            font-weight: bold; color: #222; cursor: pointer;
-            padding: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 5px;
-        }
-        .sub-card {
-            background: white;
-            border-radius: 16px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            border: 1px solid #eef2f6;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .back-btn { background: none; border: none; font-size: 18px; font-weight: bold; color: #222; cursor: pointer; padding: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+        .sub-card { background: white; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; border: 1px solid #eef2f6; cursor: pointer; transition: 0.2s; }
         .sub-card:hover { transform: translateY(-1px); }
-        .sub-card .sub-title {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 5px;
-            color: #222;
-        }
+        .sub-card .sub-title { font-size: 16px; font-weight: 500; margin-bottom: 5px; color: #222; }
         .sub-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        #quizScreen, #resultScreen, #articleScreen { display: none; }
+        .quiz-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
+        .question-progress { color: #888; font-size: 14px; margin-bottom: 10px; }
+        .question-text { font-size: 20px; font-weight: 500; margin-bottom: 20px; }
         
-        #quizScreen, #resultScreen { display: none; }
-        .quiz-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .question-progress {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        .question-text {
-            font-size: 20px;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-        .option-btn {
-            display: block;
-            width: 100%;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            font-size: 16px;
-            text-align: left;
-            cursor: pointer;
-        }
+        .option-btn { display: block; width: 100%; padding: 14px; margin-bottom: 10px; background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; text-align: left; cursor: pointer; }
         .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; }
         .option-btn.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
         .option-btn:disabled { opacity: 0.6; cursor: default; }
 
-        #writeMode, #conjugationMode { display: none; text-align: center; }
-        .write-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 20px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            outline: none;
-        }
+        #writeMode { display: none; text-align: center; }
+        .write-input { width: 100%; padding: 15px; font-size: 20px; border: 2px solid #ddd; border-radius: 12px; margin-bottom: 15px; outline: none; }
         .write-input:focus { border-color: var(--primary); }
         .write-input.correct { border-color: #28a745; background: #d4edda; }
         .write-input.wrong { border-color: #dc3545; background: #f8d7da; }
-        .write-feedback {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: none;
-        }
+        .write-feedback { font-size: 18px; font-weight: bold; margin-bottom: 10px; display: none; }
         .write-feedback.correct { color: #28a745; display: block; }
         .write-feedback.wrong { color: #dc3545; display: block; }
 
-        .action-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .btn {
-            padding: 12px 18px;
-            border: none;
-            border-radius: 25px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            flex: 1;
-        }
+        #articleMode { display: none; flex-direction: column; gap: 15px; }
+        .art-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .art-header .title { font-weight: 700; font-size: 18px; }
+        .art-header .score { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .art-header .percent { background: var(--yellow); padding: 2px 10px; border-radius: 20px; font-size: 13px; }
+        .card-area { text-align: center; }
+        .card-area .label { font-size: 11px; letter-spacing: 1px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; }
+        .card-area .word { font-family: 'Times New Roman', serif; font-size: 48px; font-weight: 700; margin: 5px 0; }
+        .card-area .translation { font-size: 16px; color: #777; margin-bottom: 15px; }
+        .art-buttons { display: flex; gap: 12px; justify-content: center; margin-bottom: 15px; }
+        .art-btn { flex: 1; max-width: 120px; padding: 14px 0; border: 2px solid #e0e0e0; border-radius: 16px; background: #fff; font-size: 20px; font-weight: 700; cursor: pointer; transition: 0.15s; }
+        .art-btn:active { transform: scale(0.95); }
+        .art-btn.correct { border-color: #28a745; background: #d4edda; color: #28a745; }
+        .art-btn.wrong { border-color: #dc3545; background: #f8d7da; color: #dc3545; }
+        .art-btn:disabled { opacity: 0.5; cursor: default; }
+
+        .rules-hints { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 5px; }
+        .rule-item { background: #f9f6f0; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .rule-item .art { font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+        .rule-item .art.der { background: #3b82f6; color: #fff; }
+        .rule-item .art.die { background: #ef4444; color: #fff; }
+        .rule-item .art.das { background: #f59e0b; color: #fff; }
+
+        .word-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .word-pill { background: #fff; padding: 6px 4px; border-radius: 12px; font-size: 12px; font-weight: 500; text-align: center; border: 2px solid transparent; }
+        .word-pill .art { font-weight: 700; }
+        .word-pill .art.der { color: #3b82f6; } .word-pill .art.die { color: #ef4444; } .word-pill .art.das { color: #f59e0b; }
+        .word-pill.active { border-color: var(--black); background: #f9f6f0; }
+
+        .nav-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .nav-btn { background: transparent; border: none; font-size: 15px; font-weight: 600; cursor: pointer; padding: 8px 16px; border-radius: 30px; color: #555; }
+        .nav-btn:active { transform: scale(0.95); }
+        .nav-btn.skip { background: var(--black); color: #fff; padding: 10px 24px; }
+
+        .action-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 12px 18px; border: none; border-radius: 25px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; flex: 1; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-black { background: var(--black); color: white; }
         .btn-fav { flex: 0.5; background: #fff5e6; border: 2px solid #ffcc80; color: #e65100; }
         .btn-fav.active { background: #fff3e0; border-color: #ff9800; }
 
-        .speaker-btn {
-            background: none; border: none;
-            font-size: 28px; cursor: pointer;
-            margin-left: 10px; vertical-align: middle;
-            transition: 0.2s;
-        }
-        .speaker-btn:active { transform: scale(0.9); }
-        .speaker-btn.disabled { opacity: 0.5; pointer-events: none; }
-        
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 300;
-        }
-        .modal {
-            background: white;
-            width: 90%; max-width: 400px;
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-        }
-        .modal h3 { margin-top: 0; }
-        .btn-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-half { flex: 1; padding: 12px; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 16px;}
-
-        .action-menu-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4);
-            display: none;
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 200;
-        }
-        .action-menu {
-            background: white;
-            width: 100%; max-width: 450px;
-            border-radius: 20px 20px 0 0;
-            padding: 20px 0 30px 0;
-            text-align: left;
-        }
-        .action-item {
-            display: flex; align-items: center;
-            padding: 15px 25px; gap: 15px;
-            font-size: 16px; cursor: pointer;
-            color: #222;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
+        .modal { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 20px; text-align: center; }
+        .action-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: flex-end; z-index: 200; }
+        .action-menu { background: white; width: 100%; max-width: 450px; border-radius: 20px 20px 0 0; padding: 20px 0 30px 0; text-align: left; }
+        .action-item { display: flex; align-items: center; padding: 15px 25px; gap: 15px; font-size: 16px; cursor: pointer; color: #222; }
         .action-item:active { background: #f5f5f5; }
         .action-item span { font-size: 20px; width: 24px; text-align: center; color: #555; }
         
         .result-box { text-align: center; padding: 20px 0; }
         .result-score { font-size: 40px; color: var(--primary); font-weight: bold; margin: 10px 0; }
-
-        #renameModal .modal { text-align: left; }
-        #renameModal input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; margin: 10px 0;}
+        @media (max-width: 480px) {
+            .art-btn { font-size: 18px; padding: 12px 0; max-width: 100px; }
+            .word-grid { grid-template-columns: repeat(4, 1fr); }
+        }
     </style>
 </head>
 <body>
-
 <div class="app">
-    <div class="header">
-        <h1>Ассистент</h1>
-        <div class="header-icons">
-            <span onclick="openSettings()">⚙️</span>
-        </div>
-    </div>
+    <div class="header"><h1>Ассистент</h1><div class="header-icons"><span onclick="openSettings()">⚙️</span></div></div>
 
-    <div id="menuScreen">
-        <div id="unitList"></div>
-    </div>
+    <div id="menuScreen"><div id="unitList"></div></div>
 
     <div id="subMenuScreen">
         <button class="back-btn" onclick="goToUnits()">← Назад к юнитам</button>
         <div id="subList"></div>
     </div>
 
+    <!-- ОСНОВНОЙ ТЕСТ -->
     <div id="quizScreen">
         <div class="header">
             <h1 style="font-size: 20px; cursor: pointer;" onclick="goToSubs()">← Назад</h1>
@@ -245,8 +129,10 @@
             <div class="question-progress" id="progressText">Вопрос 1</div>
             <div class="question-text" id="questionText">Слово</div>
             
+            <!-- Режим 1: выбор -->
             <div id="optionsContainer"></div>
             
+            <!-- Режим 2: письмо -->
             <div id="writeMode">
                 <p style="font-size: 14px; color: #888; margin-bottom: 5px;">Напиши перевод на немецком:</p>
                 <input type="text" class="write-input" id="writeInput" placeholder="Введите слово..." autocomplete="off" spellcheck="false">
@@ -254,11 +140,32 @@
                 <button class="btn btn-primary" id="writeCheckBtn" onclick="checkWriteAnswer()">Проверить ➜</button>
             </div>
 
-            <div id="conjugationMode">
-                <p style="font-size: 14px; color: #888; margin-bottom: 5px;">Впиши правильную форму глагола для этого местоимения:</p>
-                <input type="text" class="write-input" id="conjInput" placeholder="Напиши форму..." autocomplete="off" spellcheck="false">
-                <div class="write-feedback" id="conjFeedback"></div>
-                <button class="btn btn-primary" id="conjCheckBtn" onclick="checkConjugationAnswer()">Проверить ➜</button>
+            <!-- РЕЖИМ 3: АРТИКЛИ -->
+            <div id="articleMode">
+                <div class="art-header">
+                    <div class="title">Артикли</div>
+                    <div class="score"><span id="artScore">0/0</span><span class="percent" id="artPercent">0%</span></div>
+                </div>
+                <div class="card-area">
+                    <div class="label">ВЫБЕРИ АРТИКЛЬ</div>
+                    <div class="word" id="artWord">Arzt</div>
+                    <div class="translation" id="artTranslation">врач</div>
+                    <div class="art-buttons">
+                        <button class="art-btn" data-art="der">der</button>
+                        <button class="art-btn" data-art="die">die</button>
+                        <button class="art-btn" data-art="das">das</button>
+                    </div>
+                    <div class="rules-hints">
+                        <div class="rule-item"><span class="art die">die</span> -ung → die Wohnung</div>
+                        <div class="rule-item"><span class="art das">das</span> -chen → das Mädchen</div>
+                        <div class="rule-item"><span class="art die">die</span> -eit / -keit → die Zeit</div>
+                    </div>
+                    <div class="nav-buttons">
+                        <button class="nav-btn" id="artPrevBtn" onclick="prevArtQuestion()">← Назад</button>
+                        <button class="nav-btn skip" id="artSkipBtn" onclick="skipArtQuestion()">Пропустить →</button>
+                    </div>
+                </div>
+                <div class="word-grid" id="artGrid"></div>
             </div>
 
             <div class="action-row">
@@ -273,20 +180,14 @@
         <div class="quiz-card result-box">
             <h3>Результат</h3>
             <div class="result-score" id="scoreText">0 / 0</div>
-            <p id="gradeText" style="color:#666;"></p>
-            <br>
+            <p id="gradeText" style="color:#666;"></p><br>
             <button class="btn btn-primary" onclick="goHome()">В меню</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="resumeModal">
-        <div class="modal">
-            <h3>⏳ Прогресс найден!</h3>
-            <p style="color:#666;">У тебя есть сохраненный прогресс. Продолжить?</p>
-            <div class="btn-row">
-                <button class="btn-half" style="background: #f1f2f6; color: #333;" onclick="declineResume()">Начать заново</button>
-                <button class="btn-half" style="background: var(--primary); color: white;" onclick="acceptResume()">Продолжить</button>
-            </div>
+        <div class="modal"><h3>⏳ Прогресс найден!</h3><p style="color:#666;">У тебя есть сохраненный прогресс. Продолжить?</p>
+            <div class="btn-row"><button class="btn-half" onclick="declineResume()">Начать заново</button><button class="btn-half" onclick="acceptResume()">Продолжить</button></div>
         </div>
     </div>
 
@@ -297,65 +198,28 @@
                 <button class="btn-half" style="background:#e0f2f1; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer;" onclick="closeSettings()">✕</button>
             </div>
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="shuffleQuestions" checked>
-                <label for="shuffleQuestions">Перемешать вопросы</label>
+                <input type="checkbox" id="shuffleCheck" checked><label for="shuffleCheck">Перемешать вопросы</label>
             </div>
-            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="shuffleAnswers">
-                <label for="shuffleAnswers">Перемешать ответы</label>
-            </div>
-            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="favOnly">
-                <label for="favOnly">Только избранные вопросы</label>
-            </div>
-            <button class="btn btn-primary" style="width:100%;" onclick="saveSettings()">Сохранить</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="renameModal">
-        <div class="modal" style="text-align: left;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0;">Переименовать</h3>
-                <button class="btn-half" style="background:#e0f2f1; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer;" onclick="closeRename()">✕</button>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label style="font-weight: bold; display: block; margin-bottom: 5px;">Введи новое название:</label>
-                <input type="text" id="renameInput" placeholder="Новое название...">
-            </div>
-            <button class="btn btn-primary" style="width:100%;" onclick="saveRename()">Сохранить</button>
+            <button class="btn btn-primary" style="width:100%;" onclick="startFromSettings()">Сохранить</button>
         </div>
     </div>
 
     <div class="action-menu-overlay" id="actionMenu">
         <div class="action-menu">
-            <div class="action-item" onclick="startUnit('train')">
-                <span>✔️</span> Тренировочный тест (выбор)
-            </div>
-            <div class="action-item" onclick="startUnit('exam')">
-                <span>⚡</span> Экзамен (выбор)
-            </div>
-            <div class="action-item" onclick="startUnit('schreiben')">
-                <span>✍️</span> Правописание (Шрайбен)
-            </div>
-            <div class="action-item" onclick="startUnit('conjugation')">
-                <span>🔄</span> Спряжение (Konjugation)
-            </div>
-            <div class="action-item" onclick="startUnit('mistakes')">
-                <span>🔄</span> Повтор ошибок
-            </div>
+            <div class="action-item" onclick="startUnit('train')"><span>✔️</span> Тренировочный тест</div>
+            <div class="action-item" onclick="startUnit('exam')"><span>⚡</span> Экзамен</div>
+            <div class="action-item" onclick="startUnit('schreiben')"><span>✍️</span> Правописание</div>
+            <div class="action-item" onclick="startUnit('mistakes')"><span>🔄</span> Повтор ошибок</div>
             <div style="border-top: 1px solid #eee; margin: 10px 0;"></div>
-            <div class="action-item" onclick="openRenameModal()">
-                <span>✏️</span> Переименовать
-            </div>
+            <div class="action-item" onclick="startUnit('articles')"><span>🎯</span> Спринт: Артикли (der/die/das)</div>
             <div style="border-top: 1px solid #eee; margin: 10px 0;"></div>
-            <div class="action-item" onclick="closeActionMenu()" style="color: #e74c3c;">
-                <span>✕</span> Закрыть
-            </div>
+            <div class="action-item" onclick="closeActionMenu()" style="color: #e74c3c;"><span>✕</span> Закрыть</div>
         </div>
     </div>
 </div>
 
 <script>
+    // --- БАЗА ЮНИТОВ (1-8 ҚАБЛӢ + ЮНИТИ 9: ЛЕКСИЯ 7) ---
     const units = [
         { id: 'unit1', title: '📖 Юнит 1 (Lektion 1)', subs: [
             { id: 'u1_objects', title: 'Предметы', words: [
@@ -369,8 +233,7 @@
                 { de: "das Spielzeug", ru: "игрушка" }, { de: "der Buchstabe", ru: "буква" }, { de: "der Brief", ru: "письмо" },
                 { de: "der Text", ru: "текст" }, { de: "der Satz", ru: "предложение" }, { de: "die Zahl", ru: "цифра" },
                 { de: "die Gruppe", ru: "группа" }, { de: "die Partnerin", ru: "партнерша" }, { de: "die Tabelle", ru: "таблица" },
-                { de: "die Kursleiterin", ru: "руководитель" }, { de: "das Gespräch", ru: "разговор" }, { de: "das Foto", ru: "фото" },
-                { de: "die Wendung", ru: "выражение" }
+                { de: "die Kursleiterin", ru: "руководитель" }, { de: "das Gespräch", ru: "разговор" }, { de: "das Foto", ru: "фото" }
             ]},
             { id: 'u1_verbs', title: 'Глаголы и команды', words: [
                 { de: "Sprechen Sie!", ru: "Говорите!" }, { de: "Schreiben Sie!", ru: "Пишите!" },
@@ -382,7 +245,7 @@
                 { de: "Zeichnen Sie!", ru: "Рисуйте!" }, { de: "kommen", ru: "приходить" }, { de: "heißen", ru: "называться" },
                 { de: "vergleichen", ru: "сравнивать" }, { de: "üben", ru: "упражняться" }, { de: "glauben", ru: "верить" },
                 { de: "haben", ru: "иметь" }, { de: "machen", ru: "делать" }, { de: "arbeiten", ru: "работать" },
-                { de: "studieren", ru: "учиться" }, { de: "leben", ru: "жить" }, { de: "wohnen", ru: "проживать" }
+                { de: "studieren", ru: "учиться" }
             ]},
             { id: 'u1_phrases', title: 'Фразы и приветствия', words: [
                 { de: "Ich verstehe das nicht", ru: "Я это не понимаю" }, { de: "Wie schreibt man das?", ru: "Как это пишется?" },
@@ -396,14 +259,7 @@
                 { de: "nicht so gut", ru: "не очень хорошо" }, { de: "schlecht", ru: "плохо" }, { de: "danke", ru: "спасибо" },
                 { de: "tschüss", ru: "пока" }, { de: "weiter", ru: "дальше" }, { de: "die Begrüßung", ru: "приветствие" },
                 { de: "der Abschied", ru: "прощание" }, { de: "Verabschieden Sie sich", ru: "Попрощайтесь" },
-                { de: "die Kommunikation", ru: "коммуникация" }, { de: "die Persönlichkeit", ru: "личность" },
-                { de: "auf", ru: "на" }, { de: "aus", ru: "из" }, { de: "aber", ru: "но" }, { de: "kein", ru: "никакой" },
-                { de: "nicht", ru: "не" }
-            ]},
-            { id: 'u1_wfragen', title: 'W-Fragen', words: [
-                { de: "W-Fragen", ru: "Вопросы с W" }, { de: "Was?", ru: "Что?" }, { de: "Wo?", ru: "Где?" },
-                { de: "Wer?", ru: "Кто?" }, { de: "Woher?", ru: "Откуда?" }, { de: "Warum?", ru: "Почему?" },
-                { de: "Wie oft?", ru: "Как часто?" }, { de: "Wie?", ru: "Как?" }
+                { de: "die Kommunikation", ru: "коммуникация" }, { de: "die Persönlichkeit", ru: "личность" }
             ]}
         ]},
         { id: 'unit2', title: '📖 Юнит 2 (Lektion 2)', subs: [
@@ -417,39 +273,7 @@
                 { de: "der Lehrer", ru: "учитель" }, { de: "der Verkäufer", ru: "продавец" },
                 { de: "der Kellner", ru: "официант" }, { de: "die Krankenschwester", ru: "медсестра" },
                 { de: "der Flugbegleiter", ru: "бортпроводник" }, { de: "der Rechtsanwalt", ru: "юрист" },
-                { de: "der Beruf", ru: "профессия" }, { de: "die Arbeit", ru: "работа" },
-                { de: "die Ausbildung", ru: "специальность" }, { de: "der Familienstand", ru: "Семейный статус" },
-                { de: "geschieden", ru: "разведенный" }, { de: "verheiratet", ru: "женат/замужем" },
-                { de: "zusammen", ru: "вместе" }, { de: "das Kind", ru: "ребенок" },
-                { de: "single", ru: "холостой" }, { de: "allein", ru: "один" }
-            ]},
-            { id: 'u2_verbs_actions', title: 'Глаголы и действия', words: [
-                { de: "studieren", ru: "учиться" }, { de: "verkaufen", ru: "продавать" },
-                { de: "erklären", ru: "объяснять" }, { de: "reparieren", ru: "чинить" },
-                { de: "spielen", ru: "играть" }, { de: "sortieren", ru: "сортировать" },
-                { de: "sprechen", ru: "говорить" }, { de: "helfen", ru: "помогать" },
-                { de: "montieren", ru: "чинить/монтировать" }, { de: "telefonieren", ru: "звонить" },
-                { de: "Interviews machen", ru: "брать интервью" }, { de: "Medikamente geben", ru: "давать лекарство" },
-                { de: "Texte schreiben", ru: "писать текст" }, { de: "am Computer arbeiten", ru: "работать на компьютере" },
-                { de: "lernen", ru: "изучать" }, { de: "bekommen", ru: "получать" },
-                { de: "reservieren", ru: "резервировать" }, { de: "gehören", ru: "принадлежать" },
-                { de: "erkennen", ru: "узнавать" }, { de: "beschreiben", ru: "описывать" },
-                { de: "diskutieren", ru: "обсуждать" }, { de: "wiederholen", ru: "повторять" },
-                { de: "gratulieren", ru: "поздравлять" }, { de: "danken", ru: "благодарить" },
-                { de: "verstehen", ru: "понимать" }, { de: "wissen", ru: "знать" },
-                { de: "fliegen", ru: "летать" }, { de: "verlieren", ru: "потерять" }
-            ]},
-            { id: 'u2_phrases_prep', title: 'Фразы и предлоги', words: [
-                { de: "die Visitenkarte", ru: "визитная карточка" }, { de: "das Krankenhaus", ru: "больница" },
-                { de: "die Entschuldigung", ru: "извинение" }, { de: "beruflich", ru: "по профессии" },
-                { de: "noch einmal", ru: "еще раз" }, { de: "der Wohnort", ru: "место жительства" },
-                { de: "auf", ru: "над" }, { de: "dann", ru: "потом" }, { de: "stehen", ru: "стоять" },
-                { de: "Ich arbeite als Lehrer", ru: "Я работаю как учитель" }, { de: "Ich bin Lehrer", ru: "Я учитель" },
-                { de: "Ich arbeite bei BMW", ru: "Я работаю в BMW" }, { de: "zu kompliziert", ru: "очень сложно" },
-                { de: "Er wohnt in Köln", ru: "Он живет в Кёльне" }, { de: "Er wohnt nicht in Köln", ru: "Он не живет в Кёльне" },
-                { de: "Sehen Sie das Foto an", ru: "Смотрите на фото" }, { de: "Die Frau auf dem Bild ist Herberts Mutter", ru: "Женщина на фото - мать Герберта" },
-                { de: "Ich lebe allein", ru: "Я живу один" }, { de: "Wir sind verheiratet", ru: "Мы женаты" },
-                { de: "Wir sind nicht verheiratet", ru: "Мы не женаты" }
+                { de: "der Beruf", ru: "профессия" }, { de: "die Arbeit", ru: "работа" }
             ]}
         ]},
         { id: 'unit3', title: '📖 Юнит 3 (Lektion 3)', subs: [
@@ -463,57 +287,6 @@
                 { de: "die Oma", ru: "бабушка" }, { de: "die Großeltern", ru: "бабушка и дедушка" },
                 { de: "die Enkelin", ru: "внучка" }, { de: "der Enkel", ru: "внук" },
                 { de: "der Ehemann", ru: "муж" }, { de: "die Ehefrau", ru: "жена" }
-            ]},
-            { id: 'u3_countries', title: 'Страны и регионы', words: [
-                { de: "Belgien", ru: "Бельгия" }, { de: "Dänemark", ru: "Дания" },
-                { de: "Frankreich", ru: "Франция" }, { de: "Italien", ru: "Италия" },
-                { de: "Liechtenstein", ru: "Лихтенштейн" }, { de: "Luxemburg", ru: "Люксембург" },
-                { de: "Niederlande", ru: "Нидерланды" }, { de: "Österreich", ru: "Австрия" },
-                { de: "Polen", ru: "Польша" }, { de: "die Schweiz", ru: "Швейцария" },
-                { de: "Slowakei", ru: "Словакия" }, { de: "Slowenien", ru: "Словения" },
-                { de: "Tschechien", ru: "Чехия" }, { de: "Ungarn", ru: "Венгрия" }, { de: "Deutschland", ru: "Германия" }
-            ]},
-            { id: 'u3_languages', title: 'Языки и национальности', words: [
-                { de: "die Fremdsprache", ru: "иностранный язык" }, { de: "die Sprachen", ru: "Языки" },
-                { de: "Deutsch", ru: "немецкий" }, { de: "Englisch", ru: "английский" },
-                { de: "Russisch", ru: "русский" }, { de: "Finnisch", ru: "финский" },
-                { de: "Luxemburgisch", ru: "люксембургский" }, { de: "Spanisch", ru: "испанский" },
-                { de: "Französisch", ru: "французский" }, { de: "Italienisch", ru: "итальянский" },
-                { de: "Rätoromanisch", ru: "ретороманский" }, { de: "Niederländisch", ru: "нидерландский" },
-                { de: "Polnisch", ru: "польский" }, { de: "Schwedisch", ru: "шведский" },
-                { de: "Slowakisch", ru: "словацкий" }, { de: "Slowenisch", ru: "словенский" },
-                { de: "Tschechisch", ru: "чешский" }, { de: "Ungarisch", ru: "венгерский" }
-            ]},
-            { id: 'u3_verbs_phrases', title: 'Глаголы и Фразы', words: [
-                { de: "selbst", ru: "сам" }, { de: "Drehbuchausschnitt", ru: "отрывок из сценария" },
-                { de: "der Wohnort", ru: "место жительства" }, { de: "der Zettel", ru: "записка" },
-                { de: "das Gebiet", ru: "район" }, { de: "farbig", ru: "цветной" },
-                { de: "die Hilfe", ru: "помощь" }, { de: "kochen", ru: "готовить" },
-                { de: "skaten", ru: "кататься на скейтборде" }, { de: "zurzeit", ru: "в данный момент" },
-                { de: "bald", ru: "скоро" }, { de: "fertig", ru: "готово" },
-                { de: "gehen", ru: "идти" }, { de: "zurück", ru: "назад" },
-                { de: "der Stammbaum", ru: "семейное дерево" }, { de: "der Chemiefacharbeiter", ru: "химический рабочий" },
-                { de: "mehr", ru: "больше" }, { de: "moderieren", ru: "вести, комментировать" },
-                { de: "bis", ru: "до" }, { de: "der Sänger", ru: "певец" },
-                { de: "wählen", ru: "выбирать" }, { de: "das Ergebnis", ru: "результат" },
-                { de: "die Länder", ru: "Страны" }, { de: "jetzt", ru: "сейчас" }
-            ]},
-            { id: 'u3_numbers', title: '🔢 Числа от 0 до 1 млн.', words: [
-                { de: "null", ru: "ноль" }, { de: "eins", ru: "один" }, { de: "zwei", ru: "два" },
-                { de: "drei", ru: "три" }, { de: "vier", ru: "четыре" }, { de: "fünf", ru: "пять" },
-                { de: "sechs", ru: "шесть" }, { de: "sieben", ru: "семь" }, { de: "acht", ru: "восемь" },
-                { de: "neun", ru: "девять" }, { de: "zehn", ru: "десять" }, { de: "elf", ru: "одиннадцать" },
-                { de: "zwölf", ru: "двенадцать" }, { de: "dreizehn", ru: "тринадцать" },
-                { de: "vierzehn", ru: "четырнадцать" }, { de: "fünfzehn", ru: "пятнадцать" },
-                { de: "sechzehn", ru: "шестнадцать" }, { de: "siebzehn", ru: "семнадцать" },
-                { de: "achtzehn", ru: "восемнадцать" }, { de: "neunzehn", ru: "девятнадцать" },
-                { de: "zwanzig", ru: "двадцать" }, { de: "dreißig", ru: "тридцать" },
-                { de: "vierzig", ru: "сорок" }, { de: "fünfzig", ru: "пятьдесят" },
-                { de: "sechzig", ru: "шестьдесят" }, { de: "siebzig", ru: "семьдесят" },
-                { de: "achtzig", ru: "восемьдесят" }, { de: "neunzig", ru: "девяносто" },
-                { de: "einhundert", ru: "сто" }, { de: "tausend", ru: "тысяча" },
-                { de: "zehntausend", ru: "десять тысяч" }, { de: "hunderttausend", ru: "сто тысяч" },
-                { de: "eine Million", ru: "один миллион" }, { de: "fünfundzwanzig", ru: "двадцать пять" }
             ]}
         ]},
         { id: 'unit4', title: '📖 Юнит 4 (Базовые знания)', subs: [
@@ -522,80 +295,7 @@
                 { de: "der Computer", ru: "компьютер" }, { de: "der Wagen", ru: "машина" }, { de: "der Mensch", ru: "человек" },
                 { de: "der Buchstabe", ru: "буква" }, { de: "der Brief", ru: "письмо" }, { de: "der Text", ru: "текст" },
                 { de: "der Satz", ru: "предложение" }, { de: "der Tag", ru: "день" }, { de: "der Arbeitgeber", ru: "работодатель" },
-                { de: "der Beruf", ru: "профессия" }, { de: "der Job", ru: "работа" }, { de: "der Architekt", ru: "архитектор" },
-                { de: "der Arzt", ru: "врач" }, { de: "der Friseur", ru: "парикмахер" }, { de: "der Ingenieur", ru: "инженер" },
-                { de: "der Journalist", ru: "журналист" }, { de: "der Kellner", ru: "официант" }, { de: "der Lehrer", ru: "учитель" },
-                { de: "der Student", ru: "студент" }, { de: "der Schauspieler", ru: "актер" }, { de: "der Schüler", ru: "ученик" },
-                { de: "der Sekretär", ru: "секретарь" }, { de: "der Verkäufer", ru: "продавец" }, { de: "der Familienstand", ru: "семейное положение" },
-                { de: "der Wohnort", ru: "место жительства" }, { de: "der Vater", ru: "отец" }, { de: "der Sohn", ru: "сын" },
-                { de: "der Bruder", ru: "брат" }, { de: "der Großvater", ru: "дедушка" }, { de: "der Opa", ru: "дедушка" },
-                { de: "der Enkel", ru: "внук" }, { de: "der Ehemann", ru: "муж" }, { de: "der Zettel", ru: "записка" },
-                { de: "der Stammbaum", ru: "семейное дерево" }, { de: "der Sänger", ru: "певец" }, 
-                { de: "der Chemiefacharbeiter", ru: "химический рабочий" }, { de: "der Flugbegleiter", ru: "бортпроводник" },
-                { de: "der Rechtsanwalt", ru: "юрист" },
-                { de: "die Lampe", ru: "лампа" }, { de: "die Tasche", ru: "сумка" }, { de: "die Blume", ru: "цветок" },
-                { de: "die Vase", ru: "ваза" }, { de: "die Straße", ru: "улица" }, { de: "die Übung", ru: "упражнение" },
-                { de: "die Zeitung", ru: "газета" }, { de: "die Zeitschrift", ru: "журнал" }, { de: "die Zahl", ru: "цифра" },
-                { de: "die Gruppe", ru: "группа" }, { de: "die Partnerin", ru: "партнерша" }, { de: "die Tabelle", ru: "таблица" },
-                { de: "die Kursleiterin", ru: "руководитель курса" }, { de: "die Schule", ru: "школа" }, 
-                { de: "die Stelle", ru: "должность" }, { de: "die Krankenschwester", ru: "медсестра" }, 
-                { de: "die Visitenkarte", ru: "визитка" }, { de: "die Entschuldigung", ru: "извинение" },
-                { de: "die Mutter", ru: "мать" }, { de: "die Tochter", ru: "дочь" }, { de: "die Schwester", ru: "сестра" },
-                { de: "die Großmutter", ru: "бабушка" }, { de: "die Oma", ru: "бабушка" }, { de: "die Enkelin", ru: "внучка" },
-                { de: "die Ehefrau", ru: "жена" }, { de: "die Fremdsprache", ru: "иностранный язык" },
-                { de: "die Schweiz", ru: "Швейцария" }, { de: "die Hilfe", ru: "помощь" }, { de: "die Arbeit", ru: "работа" },
-                { de: "die Ausbildung", ru: "специальность" }, { de: "die Türkei", ru: "Турция" }, { de: "die Slowakei", ru: "Словакия" },
-                { de: "das Buch", ru: "книга" }, { de: "das Bild", ru: "картина" }, { de: "das Wort", ru: "слово" },
-                { de: "das Haus", ru: "дом" }, { de: "das Zimmer", ru: "комната" }, { de: "das Kind", ru: "ребенок" },
-                { de: "das Mädchen", ru: "девочка" }, { de: "das Spielzeug", ru: "игрушка" }, 
-                { de: "das Gespräch", ru: "разговор" }, { de: "das Foto", ru: "фотография" },
-                { de: "das Alter", ru: "возраст" }, { de: "das Jahr", ru: "год" }, { de: "das Praktikum", ru: "практика" },
-                { de: "das Krankenhaus", ru: "больница" }, { de: "das Familienmitglied", ru: "член семьи" },
-                { de: "das Gebiet", ru: "район" }, { de: "das Ergebnis", ru: "результат" }, { de: "das Belgien", ru: "Бельгия" },
-                { de: "das Dänemark", ru: "Дания" }, { de: "das Frankreich", ru: "Франция" }, { de: "das Italien", ru: "Италия" },
-                { de: "das Liechtenstein", ru: "Лихтенштейн" }, { de: "das Luxemburg", ru: "Люксембург" }, 
-                { de: "das Österreich", ru: "Австрия" }, { de: "das Polen", ru: "Польша" }, { de: "das Slowenien", ru: "Словения" },
-                { de: "das Tschechien", ru: "Чехия" }, { de: "das Ungarn", ru: "Венгрия" }
-            ]},
-            { id: 'u4_adjectives', title: 'Прилагательные (Adjektive)', words: [
-                { de: "gut", ru: "хороший" }, { de: "schlecht", ru: "плохой" },
-                { de: "richtig", ru: "правильный" }, { de: "falsch", ru: "неправильный" },
-                { de: "super", ru: "суперский" }, { de: "farbig", ru: "цветной" },
-                { de: "beruflich", ru: "профессиональный" }, { de: "fertig", ru: "готовый" },
-                { de: "verheiratet", ru: "женатый/замужняя" }, { de: "geschieden", ru: "разведенный" },
-                { de: "kompliziert", ru: "сложный" }, { de: "allein", ru: "одинокий / один" },
-                { de: "selbst", ru: "сам" }, { de: "mehr", ru: "больше" }, { de: "bald", ru: "скоро" },
-                { de: "zurzeit", ru: "в данный момент" }, { de: "single", ru: "холостой" },
-                { de: "arbeitslos", ru: "безработный" }
-            ]},
-            { id: 'u4_verbs', title: 'Глаголы (Verben)', words: [
-                { de: "kommen", ru: "приходить" }, { de: "heißen", ru: "называться" },
-                { de: "vergleichen", ru: "сравнивать" }, { de: "üben", ru: "упражняться" },
-                { de: "arbeiten", ru: "работать" }, { de: "studieren", ru: "учиться" },
-                { de: "leben", ru: "жить" }, { de: "wohnen", ru: "проживать" },
-                { de: "glauben", ru: "верить" }, { de: "haben", ru: "иметь" },
-                { de: "machen", ru: "делать" }, { de: "sprechen", ru: "говорить" },
-                { de: "schreiben", ru: "писать" }, { de: "lesen", ru: "читать" },
-                { de: "hören", ru: "слушать" }, { de: "fragen", ru: "спрашивать" },
-                { de: "antworten", ru: "отвечать" }, { de: "zeigen", ru: "показывать" },
-                { de: "ergänzen", ru: "заполнять" }, { de: "kreuzen", ru: "отмечать крестом" },
-                { de: "ordnen", ru: "упорядочивать" }, { de: "markieren", ru: "отмечать" },
-                { de: "zeichnen", ru: "рисовать" }, { de: "verstehen", ru: "понимать" },
-                { de: "helfen", ru: "помогать" }, { de: "telefonieren", ru: "звонить" },
-                { de: "sortieren", ru: "сортировать" }, { de: "reparieren", ru: "чинить" },
-                { de: "erklären", ru: "объяснять" }, { de: "spielen", ru: "играть" },
-                { de: "montieren", ru: "монтировать" }, { de: "beschreiben", ru: "описывать" },
-                { de: "diskutieren", ru: "обсуждать" }, { de: "wiederholen", ru: "повторять" },
-                { de: "gratulieren", ru: "поздравлять" }, { de: "danken", ru: "благодарить" },
-                { de: "wissen", ru: "знать" }, { de: "fliegen", ru: "летать" },
-                { de: "verlieren", ru: "терять" }, { de: "bekommen", ru: "получать" },
-                { de: "reservieren", ru: "резервировать" }, { de: "gehören", ru: "принадлежать" },
-                { de: "erkennen", ru: "узнавать" }, { de: "gehen", ru: "идти" },
-                { de: "kochen", ru: "готовить" }, { de: "skaten", ru: "кататься на скейте" },
-                { de: "moderieren", ru: "вести (программу)" }, { de: "wählen", ru: "выбирать" },
-                { de: "stehen", ru: "стоять" }, { de: "lernen", ru: "изучать" },
-                { de: "verkaufen", ru: "продавать" }, { de: "sehen", ru: "смотреть" },
-                { de: "ankreuzen", ru: "отметить галочкой" }
+                { de: "der Beruf", ru: "профессия" }, { de: "der Job", ru: "работа" }
             ]}
         ]},
         { id: 'unit5', title: '📖 Юнит 5 (Существительные по родам)', subs: [
@@ -603,589 +303,303 @@
                 { de: "der Tisch", ru: "стол" }, { de: "der Stuhl", ru: "стул" }, { de: "der Stift", ru: "карандаш" },
                 { de: "der Computer", ru: "компьютер" }, { de: "der Wagen", ru: "машина" }, { de: "der Mensch", ru: "человек" },
                 { de: "der Buchstabe", ru: "буква" }, { de: "der Brief", ru: "письмо" }, { de: "der Text", ru: "текст" },
-                { de: "der Satz", ru: "предложение" }, { de: "der Tag", ru: "день" }, { de: "der Arbeitgeber", ru: "работодатель" },
-                { de: "der Beruf", ru: "профессия" }, { de: "der Job", ru: "работа" }, { de: "der Architekt", ru: "архитектор" },
-                { de: "der Arzt", ru: "врач" }, { de: "der Friseur", ru: "парикмахер" }, { de: "der Ingenieur", ru: "инженер" },
-                { de: "der Journalist", ru: "журналист" }, { de: "der Kellner", ru: "официант" }, { de: "der Lehrer", ru: "учитель" },
-                { de: "der Student", ru: "студент" }, { de: "der Schauspieler", ru: "актер" }, { de: "der Schüler", ru: "ученик" },
-                { de: "der Sekretär", ru: "секретарь" }, { de: "der Verkäufer", ru: "продавец" }, { de: "der Familienstand", ru: "семейное положение" },
-                { de: "der Wohnort", ru: "место жительства" }, { de: "der Vater", ru: "отец" }, { de: "der Sohn", ru: "сын" },
-                { de: "der Bruder", ru: "брат" }, { de: "der Großvater", ru: "дедушка" }, { de: "der Opa", ru: "дедушка" },
-                { de: "der Enkel", ru: "внук" }, { de: "der Ehemann", ru: "муж" }, { de: "der Zettel", ru: "записка" },
-                { de: "der Stammbaum", ru: "семейное дерево" }, { de: "der Sänger", ru: "певец" }, 
-                { de: "der Chemiefacharbeiter", ru: "химический рабочий" }, { de: "der Flugbegleiter", ru: "бортпроводник" },
-                { de: "der Rechtsanwalt", ru: "юрист" }
+                { de: "der Satz", ru: "предложение" }, { de: "der Tag", ru: "день" }
             ]},
             { id: 'u5_die', title: 'Женский род (die)', words: [
                 { de: "die Lampe", ru: "лампа" }, { de: "die Tasche", ru: "сумка" }, { de: "die Blume", ru: "цветок" },
                 { de: "die Vase", ru: "ваза" }, { de: "die Straße", ru: "улица" }, { de: "die Übung", ru: "упражнение" },
                 { de: "die Zeitung", ru: "газета" }, { de: "die Zeitschrift", ru: "журнал" }, { de: "die Zahl", ru: "цифра" },
-                { de: "die Gruppe", ru: "группа" }, { de: "die Partnerin", ru: "партнерша" }, { de: "die Tabelle", ru: "таблица" },
-                { de: "die Kursleiterin", ru: "руководитель курса" }, { de: "die Schule", ru: "школа" }, 
-                { de: "die Stelle", ru: "должность" }, { de: "die Krankenschwester", ru: "медсестра" }, 
-                { de: "die Visitenkarte", ru: "визитка" }, { de: "die Entschuldigung", ru: "извинение" },
-                { de: "die Mutter", ru: "мать" }, { de: "die Tochter", ru: "дочь" }, { de: "die Schwester", ru: "сестра" },
-                { de: "die Großmutter", ru: "бабушка" }, { de: "die Oma", ru: "бабушка" }, { de: "die Enkelin", ru: "внучка" },
-                { de: "die Ehefrau", ru: "жена" }, { de: "die Fremdsprache", ru: "иностранный язык" },
-                { de: "die Schweiz", ru: "Швейцария" }, { de: "die Hilfe", ru: "помощь" }, { de: "die Arbeit", ru: "работа" },
-                { de: "die Ausbildung", ru: "специальность" }, { de: "die Türkei", ru: "Турция" }, { de: "die Slowakei", ru: "Словакия" }
+                { de: "die Gruppe", ru: "группа" }, { de: "die Schule", ru: "школа" }
             ]},
             { id: 'u5_das', title: 'Средний род (das)', words: [
                 { de: "das Buch", ru: "книга" }, { de: "das Bild", ru: "картина" }, { de: "das Wort", ru: "слово" },
                 { de: "das Haus", ru: "дом" }, { de: "das Zimmer", ru: "комната" }, { de: "das Kind", ru: "ребенок" },
-                { de: "das Mädchen", ru: "девочка" }, { de: "das Spielzeug", ru: "игрушка" }, 
-                { de: "das Gespräch", ru: "разговор" }, { de: "das Foto", ru: "фотография" },
-                { de: "das Alter", ru: "возраст" }, { de: "das Jahr", ru: "год" }, { de: "das Praktikum", ru: "практика" },
-                { de: "das Krankenhaus", ru: "больница" }, { de: "das Familienmitglied", ru: "член семьи" },
-                { de: "das Gebiet", ru: "район" }, { de: "das Ergebnis", ru: "результат" }, { de: "das Belgien", ru: "Бельгия" },
-                { de: "das Dänemark", ru: "Дания" }, { de: "das Frankreich", ru: "Франция" }, { de: "das Italien", ru: "Италия" },
-                { de: "das Liechtenstein", ru: "Лихтенштейн" }, { de: "das Luxemburg", ru: "Люксембург" }, 
-                { de: "das Österreich", ru: "Австрия" }, { de: "das Polen", ru: "Польша" }, { de: "das Slowenien", ru: "Словения" },
-                { de: "das Tschechien", ru: "Чехия" }, { de: "das Ungarn", ru: "Венгрия" }
-            ]},
-            { id: 'u5_plural', title: 'Множественное число (die)', words: [
-                { de: "die Geschwister", ru: "братья и сестры" }, 
-                { de: "die Großeltern", ru: "бабушка и дедушка" }, 
-                { de: "die Länder", ru: "страны" }, 
-                { de: "die Niederlande", ru: "Нидерланды" }, 
-                { de: "die Eltern", ru: "родители" },
-                { de: "die Sprachen", ru: "языки" },
-                { de: "die Kinder", ru: "дети" }
+                { de: "das Mädchen", ru: "девочка" }, { de: "das Spielzeug", ru: "игрушка" }
             ]}
         ]},
         { id: 'unit6', title: '📖 Юнит 6 (Глаголы: Спряжение)', subs: [
             { id: 'u6_verbs_conjugation', title: 'Базовые глаголы (A1)', words: [
-                { de: "kommen", ru: "приходить", conjugation: { ich: "komme", du: "kommst", er: "kommt", wir: "kommen", ihr: "kommt", sie: "kommen" } },
-                { de: "arbeiten", ru: "работать", conjugation: { ich: "arbeite", du: "arbeitest", er: "arbeitet", wir: "arbeiten", ihr: "arbeitet", sie: "arbeiten" } },
-                { de: "haben", ru: "иметь", conjugation: { ich: "habe", du: "hast", er: "hat", wir: "haben", ihr: "habt", sie: "haben" } },
-                { de: "sein", ru: "быть", conjugation: { ich: "bin", du: "bist", er: "ist", wir: "sind", ihr: "seid", sie: "sind" } },
-                { de: "gehen", ru: "идти", conjugation: { ich: "gehe", du: "gehst", er: "geht", wir: "gehen", ihr: "geht", sie: "gehen" } },
-                { de: "sprechen", ru: "говорить", conjugation: { ich: "spreche", du: "sprichst", er: "spricht", wir: "sprechen", ihr: "sprecht", sie: "sprechen" } },
-                { de: "sehen", ru: "видеть / смотреть", conjugation: { ich: "sehe", du: "siehst", er: "sieht", wir: "sehen", ihr: "seht", sie: "sehen" } },
-                { de: "nehmen", ru: "брать", conjugation: { ich: "nehme", du: "nimmst", er: "nimmt", wir: "nehmen", ihr: "nehmt", sie: "nehmen" } },
-                { de: "geben", ru: "давать", conjugation: { ich: "gebe", du: "gibst", er: "gibt", wir: "geben", ihr: "gebt", sie: "geben" } },
-                { de: "lesen", ru: "читать", conjugation: { ich: "lese", du: "liest", er: "liest", wir: "lesen", ihr: "lest", sie: "lesen" } },
-                { de: "essen", ru: "есть", conjugation: { ich: "esse", du: "isst", er: "isst", wir: "essen", ihr: "esst", sie: "essen" } },
-                { de: "wissen", ru: "знать", conjugation: { ich: "weiß", du: "weißt", er: "weiß", wir: "wissen", ihr: "wisst", sie: "wissen" } },
-                { de: "können", ru: "мочь (уметь)", conjugation: { ich: "kann", du: "kannst", er: "kann", wir: "können", ihr: "könnt", sie: "können" } },
-                { de: "müssen", ru: "быть должным", conjugation: { ich: "muss", du: "musst", er: "muss", wir: "müssen", ihr: "müsst", sie: "müssen" } },
-                { de: "wollen", ru: "хотеть", conjugation: { ich: "will", du: "willst", er: "will", wir: "wollen", ihr: "wollt", sie: "wollen" } },
-                { de: "rufen", ru: "звать / кричать", conjugation: { ich: "rufe", du: "rufst", er: "ruft", wir: "rufen", ihr: "ruft", sie: "rufen" } },
-                { de: "anrufen", ru: "звонить (по телефону)", conjugation: { ich: "rufe an", du: "rufst an", er: "ruft an", wir: "rufen an", ihr: "ruft an", sie: "rufen an" } },
-                { de: "heißen", ru: "называться", conjugation: { ich: "heiße", du: "heißt", er: "heißt", wir: "heißen", ihr: "heißt", sie: "heißen" } },
-                { de: "machen", ru: "делать", conjugation: { ich: "mache", du: "machst", er: "macht", wir: "machen", ihr: "macht", sie: "machen" } },
-                { de: "wohnen", ru: "проживать", conjugation: { ich: "wohne", du: "wohnst", er: "wohnt", wir: "wohnen", ihr: "wohnt", sie: "wohnen" } },
-                { de: "studieren", ru: "учиться в вузе", conjugation: { ich: "studiere", du: "studierts", er: "studiert", wir: "studieren", ihr: "studiert", sie: "studieren" } },
-                { de: "schreiben", ru: "писать", conjugation: { ich: "schreibe", du: "schreibst", er: "schreibt", wir: "schreiben", ihr: "schreibt", sie: "schreiben" } },
-                { de: "helfen", ru: "помогать", conjugation: { ich: "helfe", du: "hilfst", er: "hilft", wir: "helfen", ihr: "helft", sie: "helfen" } },
-                { de: "trinken", ru: "пить", conjugation: { ich: "trinke", du: "trinkst", er: "trinkt", wir: "trinken", ihr: "trinkt", sie: "trinken" } },
-                { de: "fahren", ru: "ехать", conjugation: { ich: "fahre", du: "fährst", er: "fährt", wir: "fahren", ihr: "fahrt", sie: "fahren" } },
-                { de: "schlafen", ru: "спать", conjugation: { ich: "schlafe", du: "schläfst", er: "schläft", wir: "schlafen", ihr: "schlaft", sie: "schlafen" } },
-                { de: "laufen", ru: "бежать / идти пешком", conjugation: { ich: "laufe", du: "läufst", er: "läuft", wir: "laufen", ihr: "lauft", sie: "laufen" } },
-                { de: "ziehen", ru: "тянуть / переезжать", conjugation: { ich: "ziehe", du: "ziehst", er: "zieht", wir: "ziehen", ihr: "zieht", sie: "ziehen" } },
-                { de: "fliegen", ru: "летать", conjugation: { ich: "fliege", du: "fliegst", er: "fliegt", wir: "fliegen", ihr: "fliegt", sie: "fliegen" } },
-                { de: "waschen", ru: "мыть / стирать", conjugation: { ich: "wasche", du: "wäschst", er: "wäscht", wir: "waschen", ihr: "wascht", sie: "waschen" } }
+                { de: "kommen", ru: "приходить", conjugation: { ich: "komme", du: "kommst", er: "kommt" } }
+            ]}
+        ]},
+        { id: 'unit7', title: '📖 Юнит 7 (Спринт: Артикли)', subs: [
+            { id: 'u7_articles', title: '🎯 Тренажер der/die/das', words: [
+                { de: "Arzt", ru: "врач", art: "der" },
+                { de: "Hilfe", ru: "помощь", art: "die" },
+                { de: "Jahr", ru: "год", art: "das" },
+                { de: "Zeit", ru: "время", art: "die" },
+                { de: "Mädchen", ru: "девочка", art: "das" },
+                { de: "Wohnung", ru: "квартира", art: "die" },
+                { de: "Patient", ru: "пациент", art: "der" },
+                { de: "Medizin", ru: "медицина", art: "die" },
+                { de: "Krankenhaus", ru: "больница", art: "das" },
+                { de: "Termin", ru: "встреча", art: "der" },
+                { de: "Sprache", ru: "язык", art: "die" },
+                { de: "Wort", ru: "слово", art: "das" },
+                { de: "Leben", ru: "жизнь", art: "das" },
+                { de: "Arbeit", ru: "работа", art: "die" },
+                { de: "Mensch", ru: "человек", art: "der" },
+                { de: "Tablette", ru: "таблетка", art: "die" }
+            ]}
+        ]},
+        { id: 'unit8', title: '📖 Юнит 8 (Lektion 4)', subs: [
+            { id: 'u4_objects_room', title: 'Мебель и предметы', words: [
+                { de: "der Tisch", ru: "стол" }, { de: "der Schrank", ru: "шкаф" },
+                { de: "der Stuhl", ru: "стул" }, { de: "der Sessel", ru: "кресло" },
+                { de: "der Teppich", ru: "ковёр" }, { de: "die Couch", ru: "диван" },
+                { de: "die Lampe", ru: "лампа" }, { de: "das Bett", ru: "кровать" },
+                { de: "das Sofa", ru: "диван" }, { de: "das Möbel", ru: "мебель" }
+            ]},
+            { id: 'u4_adjectives_antonyms', title: 'Прилагательные и антонимы', words: [
+                { de: "klein", ru: "маленький" }, { de: "groß", ru: "большой" },
+                { de: "schön", ru: "красивый" }, { de: "hässlich", ru: "уродливый" },
+                { de: "leicht", ru: "лёгкий" }, { de: "schwer", ru: "тяжёлый" },
+                { de: "modern", ru: "современный" }, { de: "unmodern", ru: "старомодный" },
+                { de: "lang", ru: "длинный" }, { de: "kurz", ru: "короткий" },
+                { de: "teuer", ru: "дорогой" }, { de: "billig", ru: "дешёвый" },
+                { de: "günstig", ru: "дешёвый" }, { de: "wirklich", ru: "реально" },
+                { de: "genau", ru: "точно" }, { de: "nur", ru: "только" }
+            ]},
+            { id: 'u4_verbs_phrases', title: 'Глаголы и выражения', words: [
+                { de: "nennen", ru: "называть" }, { de: "passen", ru: "подходить" },
+                { de: "kosten", ru: "стоить" }, { de: "das Antonym", ru: "антоним" },
+                { de: "wie viel?", ru: "сколько?" }, { de: "wie viele?", ru: "сколько?" },
+                { de: "brauchen", ru: "нуждаться" }, { de: "das Sonderangebot", ru: "специальное предложение" },
+                { de: "der Preis", ru: "цена" }, { de: "etwas", ru: "что-нибудь" },
+                { de: "bewerten", ru: "ценить" }, { de: "die Muttersprache", ru: "родной язык" },
+                { de: "notieren", ru: "отметить" }, { de: "üben", ru: "упражняться" },
+                { de: "Zahlenschlange", ru: "очередь номеров" }
+            ]}
+        ]},
+        // --- ЮНИТ 9: ЛЕКСИЯ 7 (НАВ) ---
+        { id: 'unit9', title: '📖 Юнит 9 (Lektion 7)', subs: [
+            { id: 'u9_hobby', title: 'Свободное время и хобби', words: [
+                { de: "der Ausflug", ru: "экскурсия", art: "der" },
+                { de: "der Film", ru: "фильм", art: "der" },
+                { de: "der Lieblingsfilm", ru: "любимый фильм", art: "der" },
+                { de: "die Musik", ru: "музыка", art: "die" },
+                { de: "die Freizeit", ru: "свободное время", art: "die" },
+                { de: "das Hobby", ru: "хобби", art: "das" },
+                { de: "das Kino", ru: "кинотеатр", art: "das" }
+            ]},
+            { id: 'u9_activities', title: 'Активности и глаголы', words: [
+                { de: "backen", ru: "пекать" },
+                { de: "besuchen", ru: "посещать" },
+                { de: "treffen", ru: "встречать" },
+                { de: "fotografieren", ru: "сфотографировать" },
+                { de: "lochen", ru: "пробивать" },
+                { de: "lesen", ru: "читать" },
+                { de: "lieben", ru: "любить" },
+                { de: "malen", ru: "рисовать" },
+                { de: "Musik hören", ru: "слушать музыку" },
+                { de: "Rad fahren", ru: "ездить на велосипеде" },
+                { de: "schwimmen", ru: "плавать" },
+                { de: "singen", ru: "петь" },
+                { de: "spazieren gehen", ru: "идти на прогулку" },
+                { de: "können", ru: "мочь" },
+                { de: "rauchen", ru: "курить" },
+                { de: "spielen", ru: "играть" },
+                { de: "tanzen", ru: "танцевать" },
+                { de: "im Internet surfen", ru: "использовать интернет" },
+                { de: "Spaß machen", ru: "доставлять удовольствие" },
+                { de: "etwas gern tun", ru: "что-то делать охотно" },
+                { de: "Schach spielen", ru: "играть в шахматы" }
+            ]},
+            { id: 'u9_phrases', title: 'Наречия частоты и фразы', words: [
+                { de: "Wie oft?", ru: "как часто?" },
+                { de: "immer", ru: "всегда" },
+                { de: "oft", ru: "часто" },
+                { de: "manchmal", ru: "иногда" },
+                { de: "nie", ru: "никогда" },
+                { de: "Danken", ru: "спасибо" },
+                { de: "Vielen Dank!", ru: "большое спасибо" },
+                { de: "Auf eine Bitte reagieren", ru: "ответить на запрос" },
+                { de: "klar", ru: "понятно, чисто" },
+                { de: "natürlich", ru: "конечно" },
+                { de: "leider", ru: "к сожалению" },
+                { de: "das geht leider nicht", ru: "к сожалению это невозможно" },
+                { de: "tut mir leid", ru: "мне жаль" },
+                { de: "das Auto", ru: "машина", art: "das" },
+                { de: "das Gespräch", ru: "разговор", art: "das" },
+                { de: "das Internet", ru: "интернет", art: "das" },
+                { de: "die Natur", ru: "природа", art: "die" }
             ]}
         ]}
     ];
 
-    const reactions = {
-        wrong: [
-            "🐒🖕 Неправильно! Обезьянка показывает тебе средний палец.",
-            "🤬 Соберись, тряпка! Смотри на экран и запоминай!",
-            "😡 Серьёзный дядька смотрит на тебя с укором: 'Ошибка!'",
-            "🤦‍♂️ Даже бабушка на лавочке знает это слово. Исправляйся!",
-            "💀 О нет! Твой мозг в коме. Вспоминай правильный вариант.",
-            "🖕 Джигурда сказал бы тебе: 'Ээээээ, не правильно, братан!'"
-        ],
-        correct: [
-            "😎 В точку! Ты красавчик, брат!",
-            "💪 Молоток! Мозг работает отлично!",
-            "🎉 Правильно! Так держать, гений!",
-            "🤝 Класс! Теперь ты знаешь это слово на 5+!",
-            "🏆 Отлично! Ещё один шаг к идеальному немецкому!"
-        ]
-    };
+    // --- ПЕРЕМЕННЫЕ ---
+    let currentUnitId, currentSubId, currentQuestions, currentIndex = 0, score = 0, currentMode = 'train';
+    let artCorrect = 0, artTotal = 0, artAnswered = false;
 
-    let currentUnitId = null;
-    let currentSubId = null;
-    let currentQuestions = [];
-    let currentIndex = 0;
-    let score = 0;
-    let currentMode = 'train';
-    let currentPronoun = '';
-    let currentRenameType = '';
-    let currentRenameId = '';
+    function loadFavorites() { const favData = localStorage.getItem('assistentFavorites'); return favData ? JSON.parse(favData) : []; }
+    function saveFavorites(favList) { localStorage.setItem('assistentFavorites', JSON.stringify(favList)); }
+    function loadMistakes() { const misData = localStorage.getItem('assistentMistakes'); return misData ? JSON.parse(misData) : []; }
+    function saveMistakes(misList) { localStorage.setItem('assistentMistakes', JSON.stringify(misList)); }
+    function addMistake(wordDe) { let list = loadMistakes(); if (!list.includes(wordDe)) { list.push(wordDe); saveMistakes(list); } }
 
-    function loadNames() {
-        const namesData = localStorage.getItem('assistentNames');
-        if (namesData) return JSON.parse(namesData);
-        return {};
-    }
-    function saveNames(namesObj) {
-        localStorage.setItem('assistentNames', JSON.stringify(namesObj));
-    }
-
-    function loadSettings() {
-        const sets = localStorage.getItem('assistentSettings');
-        if (sets) return JSON.parse(sets);
-        return { shuffleQuestions: true, shuffleAnswers: false, favOnly: false };
-    }
-    function saveSettingsToLocal(sets) {
-        localStorage.setItem('assistentSettings', JSON.stringify(sets));
-    }
-
-    function loadFavorites() {
-        const favData = localStorage.getItem('assistentFavorites');
-        if (favData) return JSON.parse(favData);
-        return [];
-    }
-    function saveFavorites(favList) {
-        localStorage.setItem('assistentFavorites', JSON.stringify(favList));
-    }
-
-    function loadMistakes() {
-        const misData = localStorage.getItem('assistentMistakes');
-        if (misData) return JSON.parse(misData);
-        return [];
-    }
-    function saveMistakes(misList) {
-        localStorage.setItem('assistentMistakes', JSON.stringify(misList));
-    }
-    function addMistake(wordDe) {
-        let list = loadMistakes();
-        if (!list.includes(wordDe)) {
-            list.push(wordDe);
-            saveMistakes(list);
-        }
-    }
-
-    function speakGerman(text) {
-        if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'de-DE';
-            utterance.rate = 0.85;
-            window.speechSynthesis.speak(utterance);
-        } else {
-            alert("Твой браузер не поддерживает озвучку.");
-        }
-    }
-
+    // --- ОТРИСОВКА МЕНЮ ---
     function renderUnits() {
-        const names = loadNames();
-        const list = document.getElementById('unitList');
-        list.innerHTML = '';
+        const list = document.getElementById('unitList'); list.innerHTML = '';
         units.forEach(unit => {
-            let title = unit.title;
-            if (names[unit.id]) title = names[unit.id];
-            const card = document.createElement('div');
-            card.className = 'unit-card';
-            let totalWords = 0;
-            unit.subs.forEach(s => totalWords += s.words.length);
-            card.innerHTML = `
-                <div class="title">${title}</div>
-                <div class="unit-stats">
-                    <span class="stat-pill">❓ ${totalWords}</span>
-                    <span class="stat-pill">📂 ${unit.subs.length} подгруппы</span>
-                </div>
-            `;
-            card.onclick = () => { openSubMenu(unit.id); };
-            list.appendChild(card);
+            let totalWords = 0; unit.subs.forEach(s => totalWords += s.words.length);
+            const card = document.createElement('div'); card.className = 'unit-card';
+            card.innerHTML = `<div class="title">${unit.title}</div><div class="unit-stats"><span class="stat-pill">❓ ${totalWords}</span><span class="stat-pill">📂 ${unit.subs.length} подгруппы</span></div>`;
+            card.onclick = () => { openSubMenu(unit.id); }; list.appendChild(card);
         });
     }
 
     function openSubMenu(unitId) {
-        currentUnitId = unitId;
-        document.getElementById('menuScreen').style.display = 'none';
-        document.getElementById('subMenuScreen').style.display = 'block';
-        const unit = units.find(u => u.id === unitId);
-        const names = loadNames();
-        const list = document.getElementById('subList');
-        list.innerHTML = '';
+        currentUnitId = unitId; document.getElementById('menuScreen').style.display = 'none'; document.getElementById('subMenuScreen').style.display = 'block';
+        const unit = units.find(u => u.id === unitId); const list = document.getElementById('subList'); list.innerHTML = '';
         unit.subs.forEach(sub => {
-            let title = sub.title;
-            if (names[sub.id]) title = names[sub.id];
-            const card = document.createElement('div');
-            card.className = 'sub-card';
-            card.innerHTML = `
-                <div class="sub-title">${title}</div>
-                <div class="sub-stats">
-                    <span class="stat-pill">❓ ${sub.words.length}</span>
-                </div>
-            `;
-            card.onclick = () => { openActionMenu(sub.id); };
-            list.appendChild(card);
+            const card = document.createElement('div'); card.className = 'sub-card';
+            card.innerHTML = `<div class="sub-title">${sub.title}</div><div class="sub-stats"><span class="stat-pill">❓ ${sub.words.length}</span></div>`;
+            card.onclick = () => { openActionMenu(sub.id); }; list.appendChild(card);
         });
     }
 
-    function goToUnits() {
-        document.getElementById('subMenuScreen').style.display = 'none';
-        document.getElementById('menuScreen').style.display = 'block';
-        localStorage.removeItem('assistentProgress');
-    }
-
-    function goToSubs() {
-        document.getElementById('quizScreen').style.display = 'none';
-        document.getElementById('subMenuScreen').style.display = 'block';
-        localStorage.removeItem('assistentProgress');
-    }
-
-    function openActionMenu(subId) {
-        currentSubId = subId;
-        document.getElementById('actionMenu').style.display = 'flex';
-    }
+    function goToUnits() { document.getElementById('subMenuScreen').style.display = 'none'; document.getElementById('menuScreen').style.display = 'block'; localStorage.removeItem('assistentProgress'); }
+    function goToSubs() { document.getElementById('quizScreen').style.display = 'none'; document.getElementById('subMenuScreen').style.display = 'block'; localStorage.removeItem('assistentProgress'); }
+    function openActionMenu(subId) { currentSubId = subId; document.getElementById('actionMenu').style.display = 'flex'; }
     function closeActionMenu() { document.getElementById('actionMenu').style.display = 'none'; }
-
-    function openRenameModal() {
-        closeActionMenu();
-        const names = loadNames();
-        currentRenameType = 'sub';
-        currentRenameId = currentSubId;
-        const input = document.getElementById('renameInput');
-        input.value = names[currentRenameId] || '';
-        document.getElementById('renameModal').style.display = 'flex';
-    }
-    function closeRename() {
-        document.getElementById('renameModal').style.display = 'none';
-    }
-    function saveRename() {
-        const input = document.getElementById('renameInput');
-        const newName = input.value.trim();
-        if (newName === '') {
-            alert("Введи название!");
-            return;
-        }
-        const names = loadNames();
-        names[currentRenameId] = newName;
-        saveNames(names);
-        closeRename();
-        openSubMenu(currentUnitId);
-    }
-
-    function openSettings() { 
-        const settings = loadSettings();
-        document.getElementById('shuffleQuestions').checked = settings.shuffleQuestions;
-        document.getElementById('shuffleAnswers').checked = settings.shuffleAnswers;
-        document.getElementById('favOnly').checked = settings.favOnly;
-        document.getElementById('settingsModal').style.display = 'flex'; 
-    }
-    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-    function saveSettings() {
-        const settings = {
-            shuffleQuestions: document.getElementById('shuffleQuestions').checked,
-            shuffleAnswers: document.getElementById('shuffleAnswers').checked,
-            favOnly: document.getElementById('favOnly').checked
-        };
-        saveSettingsToLocal(settings);
-        closeSettings();
-        if (currentQuestions.length > 0) {
-            startGame(currentQuestions, currentMode, settings.shuffleQuestions);
-        }
-    }
 
     function startUnit(type) {
         closeActionMenu();
         let subWords = [];
-        if (type === 'mistakes') {
-            const mistakesList = loadMistakes();
-            if (mistakesList.length === 0) {
-                alert("У тебя пока нет ошибок! Продолжай учить слова, и они появятся здесь.");
-                return;
-            }
-            const allWordsFlat = units.flatMap(u => u.subs.flatMap(s => s.words));
-            subWords = allWordsFlat.filter(w => mistakesList.includes(w.de));
-            if (subWords.length === 0) {
-                alert("Ошибки не найдены в базе.");
-                return;
-            }
-            currentSubId = 'mistakes';
-        } else {
-            for(let unit of units) {
-                let found = unit.subs.find(s => s.id === currentSubId);
-                if(found) {
-                    subWords = found.words;
-                    break;
-                }
-            }
-            if(subWords.length === 0) return;
-        }
-
-        let pool = subWords.map(w => {
-            const favList = loadFavorites();
-            const isFav = favList.includes(w.de);
-            return { ...w, fav: isFav };
-        });
-
-        const settings = loadSettings();
-        if (settings.favOnly) {
-            pool = pool.filter(w => w.fav);
-            if (pool.length === 0) {
-                alert("Нет избранных вопросов в этой подгруппе! Добавь слова в избранное или выключи этот фильтр.");
-                return;
-            }
-        }
-
-        const savedData = localStorage.getItem('assistentProgress');
-        if (savedData && type !== 'mistakes') {
-            try {
-                const data = JSON.parse(savedData);
-                if (data.subId === currentSubId && data.mode === type && data.index > 0 && data.index < pool.length) {
-                    document.getElementById('resumeModal').style.display = 'flex';
-                    window.pendingGame = { pool, type, savedData: data };
-                    return;
-                }
-            } catch(e) {}
-        }
-        startGame(pool, type, settings.shuffleQuestions);
+        for(let unit of units) { let found = unit.subs.find(s => s.id === currentSubId); if(found) { subWords = found.words; break; } }
+        if(subWords.length === 0) return;
+        let pool = subWords.map(w => { const favList = loadFavorites(); const isFav = favList.includes(w.de); return { ...w, fav: isFav }; });
+        startGame(pool, type);
     }
 
     function startGame(pool, type, shuffle = true) {
         currentQuestions = shuffle ? pool.sort(() => Math.random() - 0.5) : pool;
-        currentIndex = 0;
-        score = 0;
-        currentMode = type;
-        document.getElementById('subMenuScreen').style.display = 'none';
-        document.getElementById('resultScreen').style.display = 'none';
-        document.getElementById('quizScreen').style.display = 'block';
-        document.getElementById('nextBtn').style.display = 'none';
+        currentIndex = 0; score = 0; currentMode = type;
+        if(type === 'articles') { artCorrect = 0; artTotal = 0; }
+        document.getElementById('subMenuScreen').style.display = 'none'; document.getElementById('resultScreen').style.display = 'none'; document.getElementById('quizScreen').style.display = 'block'; document.getElementById('nextBtn').style.display = 'none';
         renderQuestion();
     }
 
-    function acceptResume() {
-        document.getElementById('resumeModal').style.display = 'none';
-        const data = window.pendingGame.savedData;
-        const pool = window.pendingGame.pool;
-        currentQuestions = pool;
-        currentIndex = data.index;
-        score = data.score;
-        currentMode = data.mode;
-        document.getElementById('subMenuScreen').style.display = 'none';
-        document.getElementById('resultScreen').style.display = 'none';
-        document.getElementById('quizScreen').style.display = 'block';
-        document.getElementById('nextBtn').style.display = 'none';
-        renderQuestion();
-    }
-
-    function declineResume() {
-        document.getElementById('resumeModal').style.display = 'none';
-        localStorage.removeItem('assistentProgress');
-        const data = window.pendingGame;
-        const settings = loadSettings();
-        startGame(data.pool, data.type, settings.shuffleQuestions);
-    }
-
+    // --- ОТРИСОВКА ВОПРОСА ---
     function renderQuestion() {
-        if (currentIndex >= currentQuestions.length) {
-            showResult();
-            return;
-        }
-        const saveData = { subId: currentSubId, mode: currentMode, index: currentIndex, score: score };
-        localStorage.setItem('assistentProgress', JSON.stringify(saveData));
+        if (currentIndex >= currentQuestions.length) { showResult(); return; }
+        localStorage.setItem('assistentProgress', JSON.stringify({ subId: currentSubId, mode: currentMode, index: currentIndex, score: score }));
 
         const q = currentQuestions[currentIndex];
+        const optionsContainer = document.getElementById('optionsContainer');
+        const writeMode = document.getElementById('writeMode');
+        const articleMode = document.getElementById('articleMode');
+        
+        // Скрыть всё
+        optionsContainer.style.display = 'none'; writeMode.style.display = 'none'; articleMode.style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none'; document.getElementById('progressText').innerText = `Вопрос ${currentIndex + 1} из ${currentQuestions.length}`;
         document.getElementById('progressHeader').innerText = `${currentIndex+1}/${currentQuestions.length}`;
-        document.getElementById('progressText').innerText = `Вопрос ${currentIndex + 1} из ${currentQuestions.length}`;
-        document.getElementById('nextBtn').style.display = 'none';
-
+        document.getElementById('questionText').innerText = q.ru;
+        
         const favBtn = document.getElementById('favBtn');
         favBtn.innerText = q.fav ? '⭐ В избранном' : '⭐ Избранное';
         favBtn.className = q.fav ? 'btn btn-fav active' : 'btn btn-fav';
 
-        const optionsContainer = document.getElementById('optionsContainer');
-        const writeMode = document.getElementById('writeMode');
-        const conjugationMode = document.getElementById('conjugationMode');
+        // --- СПЕЦИАЛЬНЫЙ РЕЖИМ АРТИКЛЕЙ ---
+        if (currentMode === 'articles') {
+            articleMode.style.display = 'flex';
+            document.getElementById('artWord').innerText = q.de;
+            document.getElementById('artTranslation').innerText = q.ru;
+            document.getElementById('artScore').innerText = `${artCorrect}/${artTotal}`;
+            const pct = artTotal === 0 ? 0 : Math.round((artCorrect/artTotal)*100);
+            document.getElementById('artPercent').innerText = pct + '%';
+            
+            document.querySelectorAll('.art-btn').forEach(btn => { btn.disabled = false; btn.classList.remove('correct', 'wrong'); });
+            artAnswered = false;
+            
+            // Grid
+            const grid = document.getElementById('artGrid'); grid.innerHTML = '';
+            currentQuestions.forEach((w, i) => {
+                const pill = document.createElement('div'); pill.className = 'word-pill'; if(i === currentIndex) pill.classList.add('active');
+                pill.innerHTML = `<span class="art ${w.art}">${w.art}</span> ${w.de}`; grid.appendChild(pill);
+            });
+            return;
+        }
 
-        if (currentMode === 'conjugation') {
-            optionsContainer.style.display = 'none';
-            writeMode.style.display = 'none';
-            conjugationMode.style.display = 'block';
-            const pronouns = ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'sie/Sie'];
-            const pronounMap = ['ich', 'du', 'er', 'wir', 'ihr', 'sie'];
-            const randomIndex = Math.floor(Math.random() * pronouns.length);
-            currentPronoun = pronounMap[randomIndex];
-            document.getElementById('questionText').innerText = `Спрягай глагол "${q.de}" для местоимения "${pronouns[randomIndex]}"`;
-            const input = document.getElementById('conjInput');
-            input.value = ''; input.className = 'write-input';
-            document.getElementById('conjFeedback').className = 'write-feedback';
-            document.getElementById('conjFeedback').style.display = 'none';
-            document.getElementById('conjCheckBtn').style.display = 'block';
-            input.disabled = false; input.focus();
+        // --- ОБЫЧНЫЕ РЕЖИМЫ ---
+        if (currentMode === 'schreiben') {
+            writeMode.style.display = 'block';
+            const input = document.getElementById('writeInput'); input.value = ''; input.className = 'write-input';
+            document.getElementById('writeFeedback').className = 'write-feedback'; document.getElementById('writeFeedback').style.display = 'none';
+            document.getElementById('writeCheckBtn').style.display = 'block'; input.disabled = false; input.focus();
         } else {
             optionsContainer.style.display = 'block';
-            writeMode.style.display = 'none';
-            conjugationMode.style.display = 'none';
-            document.getElementById('questionText').innerText = q.ru;
-
-            if (currentMode === 'schreiben') {
-                optionsContainer.style.display = 'none';
-                writeMode.style.display = 'block';
-                const input = document.getElementById('writeInput');
-                input.value = ''; input.className = 'write-input';
-                document.getElementById('writeFeedback').className = 'write-feedback';
-                document.getElementById('writeFeedback').style.display = 'none';
-                document.getElementById('writeCheckBtn').style.display = 'block';
-                input.disabled = false; input.focus();
-            } else {
-                optionsContainer.innerHTML = '';
-                let options = [q.de];
-                let wrongOptions = currentQuestions.filter(w => w.de !== q.de).sort(() => Math.random() - 0.5).slice(0, 3);
-                options = options.concat(wrongOptions.map(w => w.de));
-                const settings = loadSettings();
-                if (settings.shuffleAnswers) {
-                    options = options.sort(() => Math.random() - 0.5);
-                }
-                options.forEach(opt => {
-                    const btn = document.createElement('button');
-                    btn.className = 'option-btn';
-                    btn.innerText = opt;
-                    btn.onclick = () => checkAnswer(opt, btn, q.de);
-                    optionsContainer.appendChild(btn);
-                });
-            }
+            optionsContainer.innerHTML = '';
+            let options = [q.de];
+            let wrongOptions = currentQuestions.filter(w => w.de !== q.de).sort(() => Math.random() - 0.5).slice(0, 3);
+            options = options.concat(wrongOptions.map(w => w.de));
+            options = options.sort(() => Math.random() - 0.5);
+            options.forEach(opt => {
+                const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, btn, q.de); optionsContainer.appendChild(btn);
+            });
         }
     }
 
-    function checkAnswer(selected, btnElement, correctAnswer) {
-        const allBtns = document.querySelectorAll('.option-btn');
-        allBtns.forEach(btn => btn.disabled = true);
-        let feedbackDiv = document.getElementById('optionsContainer');
-        let oldMsg = document.getElementById('reactionMsg');
-        if (oldMsg) oldMsg.remove();
-        const q = currentQuestions[currentIndex];
-        const msgBox = document.createElement('div');
-        msgBox.id = 'reactionMsg';
-        msgBox.style.marginTop = '15px';
-        msgBox.style.padding = '10px';
-        msgBox.style.borderRadius = '8px';
-        msgBox.style.fontWeight = 'bold';
-        msgBox.style.textAlign = 'center';
+    // --- ЛОГИКА АРТИКЛЕЙ ---
+    document.querySelectorAll('.art-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (artAnswered) return;
+            const q = currentQuestions[currentIndex];
+            const selected = this.dataset.art; const correct = q.art;
+            artAnswered = true; artTotal++;
+            document.querySelectorAll('.art-btn').forEach(b => b.disabled = true);
+            this.classList.add(selected === correct ? 'correct' : 'wrong');
+            document.querySelectorAll('.art-btn').forEach(b => { if(b.dataset.art === correct) b.classList.add('correct'); });
+            if (selected === correct) { artCorrect++; score += 10; }
+            document.getElementById('artScore').innerText = `${artCorrect}/${artTotal}`;
+            document.getElementById('artPercent').innerText = `${artTotal === 0 ? 0 : Math.round((artCorrect/artTotal)*100)}%`;
+            document.getElementById('nextBtn').style.display = 'block';
+        });
+    });
 
-        if (selected === correctAnswer) {
-            btnElement.classList.add('correct');
-            score++;
-            const randomCorrect = reactions.correct[Math.floor(Math.random() * reactions.correct.length)];
-            msgBox.style.background = '#d4edda';
-            msgBox.style.color = '#155724';
-            msgBox.innerHTML = randomCorrect;
-        } else {
-            btnElement.classList.add('wrong');
-            addMistake(q.de);
-            allBtns.forEach(btn => { if(btn.innerText === correctAnswer) btn.classList.add('correct'); });
-            const randomWrong = reactions.wrong[Math.floor(Math.random() * reactions.wrong.length)];
-            msgBox.style.background = '#f8d7da';
-            msgBox.style.color = '#721c24';
-            msgBox.innerHTML = `
-                ${randomWrong} <br><br>
-                <b>Правильно:</b> ${correctAnswer} 
-                <button class="speaker-btn" onclick="speakGerman('${correctAnswer.replace(/'/g, "\\'")}')">🔊</button>
-            `;
-        }
-        feedbackDiv.appendChild(msgBox);
+    function prevArtQuestion() { if(currentIndex > 0) { currentIndex--; renderQuestion(); } }
+    function skipArtQuestion() { currentIndex++; renderQuestion(); }
+
+    // --- ПРОВЕРКА ОБЫЧНЫХ ОТВЕТОВ ---
+    function checkAnswer(selected, btnElement, correctAnswer) {
+        const allBtns = document.querySelectorAll('.option-btn'); allBtns.forEach(btn => btn.disabled = true);
+        if (selected === correctAnswer) { btnElement.classList.add('correct'); score++; } 
+        else { btnElement.classList.add('wrong'); allBtns.forEach(btn => { if(btn.innerText === correctAnswer) btn.classList.add('correct'); }); }
         document.getElementById('nextBtn').style.display = 'block';
     }
-
+    
     function checkWriteAnswer() {
         const q = currentQuestions[currentIndex];
-        const input = document.getElementById('writeInput');
-        const feedback = document.getElementById('writeFeedback');
-        const checkBtn = document.getElementById('writeCheckBtn');
-        let userAnswer = input.value.trim();
-        let correctAnswer = q.de;
-        input.disabled = true;
-        checkBtn.style.display = 'none';
-
+        const input = document.getElementById('writeInput'); let userAnswer = input.value.trim(); let correctAnswer = q.de;
+        input.disabled = true; document.getElementById('writeCheckBtn').style.display = 'none';
         if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
-            input.className = 'write-input correct';
-            feedback.className = 'write-feedback correct';
-            const randomCorrect = reactions.correct[Math.floor(Math.random() * reactions.correct.length)];
-            feedback.innerHTML = '✅ ' + randomCorrect;
-            feedback.style.display = 'block';
-            score++;
+            input.className = 'write-input correct'; document.getElementById('writeFeedback').className = 'write-feedback correct';
+            document.getElementById('writeFeedback').innerHTML = '✅ Правильно!'; document.getElementById('writeFeedback').style.display = 'block'; score++;
         } else {
-            input.className = 'write-input wrong';
-            feedback.className = 'write-feedback wrong';
-            addMistake(q.de);
-            const randomWrong = reactions.wrong[Math.floor(Math.random() * reactions.wrong.length)];
-            feedback.innerHTML = `
-                ❌ ${randomWrong}<br><br>
-                <b>Правильно:</b> ${correctAnswer} 
-                <button class="speaker-btn" onclick="speakGerman('${correctAnswer.replace(/'/g, "\\'")}')">🔊</button>
-            `;
-            feedback.style.display = 'block';
+            input.className = 'write-input wrong'; document.getElementById('writeFeedback').className = 'write-feedback wrong';
+            document.getElementById('writeFeedback').innerHTML = `❌ Неправильно. Правильно: ${correctAnswer}`; document.getElementById('writeFeedback').style.display = 'block';
         }
         document.getElementById('nextBtn').style.display = 'block';
     }
 
-    function checkConjugationAnswer() {
-        const q = currentQuestions[currentIndex];
-        const input = document.getElementById('conjInput');
-        const feedback = document.getElementById('conjFeedback');
-        const checkBtn = document.getElementById('conjCheckBtn');
-        let userAnswer = input.value.trim().toLowerCase();
-        let correctAnswer = q.conjugation[currentPronoun].toLowerCase();
-        input.disabled = true;
-        checkBtn.style.display = 'none';
-
-        if (userAnswer === correctAnswer) {
-            input.className = 'write-input correct';
-            feedback.className = 'write-feedback correct';
-            const randomCorrect = reactions.correct[Math.floor(Math.random() * reactions.correct.length)];
-            feedback.innerHTML = '✅ ' + randomCorrect;
-            feedback.style.display = 'block';
-            score++;
-        } else {
-            input.className = 'write-input wrong';
-            feedback.className = 'write-feedback wrong';
-            addMistake(q.de + " (" + currentPronoun + ")");
-            const randomWrong = reactions.wrong[Math.floor(Math.random() * reactions.wrong.length)];
-            feedback.innerHTML = `
-                ❌ ${randomWrong}<br><br>
-                <b>Правильно:</b> ${q.conjugation[currentPronoun]} 
-                <button class="speaker-btn" onclick="speakGerman('${q.conjugation[currentPronoun].replace(/'/g, "\\'")}')">🔊</button>
-            `;
-            feedback.style.display = 'block';
-        }
-        document.getElementById('nextBtn').style.display = 'block';
-    }
-
+    // --- ДИГАР ФУНКСИЯҲО ---
     function nextQuestion() { currentIndex++; renderQuestion(); }
-
     function toggleFavorite() {
-        const q = currentQuestions[currentIndex];
-        q.fav = !q.fav;
+        const q = currentQuestions[currentIndex]; q.fav = !q.fav;
         let favList = loadFavorites();
-        if (q.fav) { if (!favList.includes(q.de)) favList.push(q.de); } 
-        else { favList = favList.filter(f => f !== q.de); }
-        saveFavorites(favList);
-        renderQuestion();
+        if (q.fav) { if (!favList.includes(q.de)) favList.push(q.de); } else { favList = favList.filter(f => f !== q.de); }
+        saveFavorites(favList); renderQuestion();
     }
-
     function showResult() {
-        localStorage.removeItem('assistentProgress');
-        document.getElementById('quizScreen').style.display = 'none';
-        document.getElementById('resultScreen').style.display = 'block';
+        localStorage.removeItem('assistentProgress'); document.getElementById('quizScreen').style.display = 'none'; document.getElementById('resultScreen').style.display = 'block';
         document.getElementById('scoreText').innerText = `${score} / ${currentQuestions.length}`;
-        let grade = score === currentQuestions.length ? '🎉 Идеально! Ты просто зверь!' : (score >= 60 ? '👍 Хорошо, но можно лучше!' : '📖 Ошибки — это опыт. Давай ещё раз!');
-        document.getElementById('gradeText').innerText = grade;
+        document.getElementById('gradeText').innerText = score === currentQuestions.length ? '🎉 Идеально! Ты просто зверь!' : (score >= 60 ? '👍 Хорошо!' : '📖 Повтори!');
     }
-
-    function goHome() {
-        localStorage.removeItem('assistentProgress');
-        document.getElementById('menuScreen').style.display = 'block';
-        document.getElementById('quizScreen').style.display = 'none';
-        document.getElementById('resultScreen').style.display = 'none';
-        document.getElementById('subMenuScreen').style.display = 'none';
-        document.getElementById('actionMenu').style.display = 'none';
-        renderUnits();
-    }
-
-    document.getElementById('writeInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkWriteAnswer();
-    });
-    document.getElementById('conjInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkConjugationAnswer();
-    });
-
+    function goHome() { localStorage.removeItem('assistentProgress'); document.getElementById('menuScreen').style.display = 'block'; document.getElementById('quizScreen').style.display = 'none'; document.getElementById('resultScreen').style.display = 'none'; document.getElementById('subMenuScreen').style.display = 'none'; document.getElementById('actionMenu').style.display = 'none'; renderUnits(); }
+    function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
+    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+    function startFromSettings() { closeSettings(); }
     renderUnits();
 </script>
 </body>
