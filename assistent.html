@@ -223,7 +223,7 @@
 </div>
 
 <script>
-    // --- 1. ТАМОМИ МАЪЛУМОТ (ЮНИТ 1 ТО 10) ---
+    // --- 1. ТАМОМИ МАЪЛУМОТ (10 ЮНИТ БО ҲАМА 83 КАЛИМАИ ЛЕКСИЯ 8 ДАР ЯК ПОДГРУППА) ---
     const allUnitsData = [
         { id: 'unit1', title: '📖 Юнит 1 (Lektion 1)', subs: [
             { id: 'u1_objects', title: 'Предметы', words: [
@@ -391,46 +391,97 @@
                 { de: "das Internet", ru: "интернет", art: "das" }, { de: "die Natur", ru: "природа", art: "die" }
             ]}
         ]},
+        // --- ЮНИТ 10: ЛЕКСИЯ 8 БО 83 КАЛИМА (ДАР ЯК ПОДГРУППА) ---
         { id: 'unit10', title: '📖 Юнит 10 (Lektion 8)', subs: [
-            { id: 'u8_city', title: '🏙 В городе (саҳ. 14)', words: [
-                { de: "In der Stadt", ru: "В городе" }, { de: "die Ausstellung", ru: "экскурсия, выставка" },
-                { de: "die Bar", ru: "бар" }, { de: "die Disco", ru: "ночной клуб, дискотека" }, { de: "die Kneipe", ru: "кабак, пивная" },
-                { de: "das Café", ru: "кафе" }, { de: "das Konzert", ru: "концерт" }, { de: "das Museum", ru: "музей" }
-            ]},
-            { id: 'u8_place_and_things', title: '🏬 Места и вещи (саҳ. 15)', words: [
-                { de: "das Restaurant", ru: "ресторан" }, { de: "das Schwimmbad", ru: "бассейн" }, { de: "das Theater", ru: "театр" },
-                { de: "der Unterschied", ru: "разнообразие" }, { de: "melden", ru: "сообщать" }, { de: "verabschieden", ru: "прощаться" },
-                { de: "werfen", ru: "бросать" }, { de: "erzählen", ru: "рассказывать" }, { de: "das Bierglas", ru: "стакан пива" },
-                { de: "der Teller", ru: "тарелка" }, { de: "der Schlüsselhänger", ru: "держатель ключей" }, { de: "die Tasse", ru: "чашка" },
-                { de: "die Puppe", ru: "кукла" }, { de: "das Handtuch", ru: "полотенце" }, { de: "die Postkarte", ru: "открытка" },
-                { de: "die Liebe", ru: "дорогой" }, { de: "Liebe Grüße", ru: "с уважением" }, { de: "Herzliche Grüße", ru: "с наилучшими пожеланиями" },
-                { de: "geöffnet", ru: "открытый" }, { de: "der Eintritt", ru: "вход" }, { de: "der Fehler", ru: "ошибка" },
-                { de: "würfeln", ru: "бросить зарик" }, { de: "Worum", ru: "о чем" }, { de: "Ziehen", ru: "таскать" },
-                { de: "zu spät", ru: "слишком поздно" }, { de: "Etwas", ru: "что-нибудь" }, { de: "vorschlagen", ru: "предложить" },
-                { de: "Reagieren", ru: "реагировать" }, { de: "verabreden", ru: "договориться о встрече" }, { de: "der Verein", ru: "сообщество" },
-                { de: "im Urlaub", ru: "на отдыхе" }, { de: "bergen", ru: "прятать" }, { de: "wandern", ru: "скитаться" },
-                { de: "sich freuen", ru: "радоваться" }, { de: "absagen", ru: "отменять" }, { de: "die Wendung", ru: "поворот" },
-                { de: "der Spaß", ru: "удовольствие" }
-            ]},
-            { id: 'u8_days_time', title: '📅 Дни и время (саҳ. 16)', words: [
-                { de: "die Langeweile", ru: "скука" }, { de: "frische Luft", ru: "свежий воздух" }, { de: "einfach", ru: "простой" },
-                { de: "schauen", ru: "смотреть" }, { de: "draußen", ru: "на улице" }, { de: "die Woche", ru: "Неделя" },
-                { de: "der Tag", ru: "день" }, { de: "der Montag", ru: "понедельник" }, { de: "der Dienstag", ru: "вторник" },
-                { de: "der Mittwoch", ru: "среда" }, { de: "der Donnerstag", ru: "четверг" }, { de: "der Freitag", ru: "пятница" },
-                { de: "der Samstag", ru: "суббота" }, { de: "der Sonntag", ru: "воскресенье" }, { de: "Tageszeiten", ru: "Части дня" },
-                { de: "der Morgen", ru: "утро" }, { de: "der Vormittag", ru: "первая половина дня" }, { de: "der Mittag", ru: "полдень" },
-                { de: "der Nachmittag", ru: "послеобеденное время" }, { de: "der Abend", ru: "вечер" }, { de: "die Nacht", ru: "ночь" },
-                { de: "das Essen", ru: "кушать" }, { de: "der Fernseher", ru: "телевизор" }, { de: "der Kaffee", ru: "кофе" },
-                { de: "das Radio", ru: "радио" }, { de: "bald", ru: "скоро" }, { de: "besonders", ru: "особенно" },
-                { de: "höflich – unhöflich", ru: "вежливый – невежливый" }, { de: "spät", ru: "поздно" }, { de: "vielleicht", ru: "может быть" },
-                { de: "keine Lust", ru: "нет желания" }, { de: "sowieso", ru: "в любом случае" }, { de: "unglaublich", ru: "невозможно" },
-                { de: "joggen", ru: "пробежать трусцой" }, { de: "wissen", ru: "знать" }, { de: "die Lust", ru: "желание" },
-                { de: "schriftlich", ru: "письменно" }, { de: "die Stunde", ru: "час" }
+            { id: 'u8_full', title: '📖 Лекция 8 (83 слова)', words: [
+                { de: "In der Stadt", ru: "В городе" },
+                { de: "die Ausstellung", ru: "экскурсия, выставка" },
+                { de: "die Bar", ru: "бар" },
+                { de: "die Disco", ru: "ночной клуб, дискотека" },
+                { de: "die Kneipe", ru: "кабак, пивная" },
+                { de: "das Café", ru: "кафе" },
+                { de: "das Konzert", ru: "концерт" },
+                { de: "das Museum", ru: "музей" },
+                { de: "das Restaurant", ru: "ресторан" },
+                { de: "das Schwimmbad", ru: "бассейн" },
+                { de: "das Theater", ru: "театр" },
+                { de: "der Unterschied", ru: "разнообразие" },
+                { de: "melden", ru: "сообщать" },
+                { de: "verabschieden", ru: "прощаться" },
+                { de: "werfen", ru: "бросать" },
+                { de: "erzählen", ru: "рассказывать" },
+                { de: "das Bierglas", ru: "стакан пива" },
+                { de: "der Teller", ru: "тарелка" },
+                { de: "der Schlüsselhänger", ru: "держатель ключей" },
+                { de: "die Tasse", ru: "чашка" },
+                { de: "die Puppe", ru: "кукла" },
+                { de: "das Handtuch", ru: "полотенце" },
+                { de: "die Postkarte", ru: "открытка" },
+                { de: "die Liebe", ru: "дорогой" },
+                { de: "Liebe Grüße", ru: "с уважением" },
+                { de: "Herzliche Grüße", ru: "с наилучшими пожеланиями" },
+                { de: "geöffnet", ru: "открытый" },
+                { de: "der Eintritt", ru: "вход" },
+                { de: "der Fehler", ru: "ошибка" },
+                { de: "würfeln", ru: "бросить зарик" },
+                { de: "Worum", ru: "о чем" },
+                { de: "Ziehen", ru: "таскать" },
+                { de: "zu spät", ru: "слишком поздно" },
+                { de: "Etwas", ru: "что-нибудь" },
+                { de: "vorschlagen", ru: "предложить" },
+                { de: "Reagieren", ru: "реагировать" },
+                { de: "verabreden", ru: "договориться о встрече" },
+                { de: "der Verein", ru: "сообщество" },
+                { de: "im Urlaub", ru: "на отдыхе" },
+                { de: "bergen", ru: "прятать" },
+                { de: "wandern", ru: "скитаться" },
+                { de: "sich freuen", ru: "радоваться" },
+                { de: "absagen", ru: "отменять" },
+                { de: "die Wendung", ru: "поворот" },
+                { de: "der Spaß", ru: "удовольствие" },
+                { de: "die Langeweile", ru: "скука" },
+                { de: "frische Luft", ru: "свежий воздух" },
+                { de: "einfach", ru: "простой" },
+                { de: "schauen", ru: "смотреть" },
+                { de: "draußen", ru: "на улице" },
+                { de: "die Woche", ru: "Неделя" },
+                { de: "der Tag", ru: "день" },
+                { de: "der Montag", ru: "понедельник" },
+                { de: "der Dienstag", ru: "вторник" },
+                { de: "der Mittwoch", ru: "среда" },
+                { de: "der Donnerstag", ru: "четверг" },
+                { de: "der Freitag", ru: "пятница" },
+                { de: "der Samstag", ru: "суббота" },
+                { de: "der Sonntag", ru: "воскресенье" },
+                { de: "Tageszeiten", ru: "Части дня" },
+                { de: "der Morgen", ru: "утро" },
+                { de: "der Vormittag", ru: "первая половина дня" },
+                { de: "der Mittag", ru: "полдень" },
+                { de: "der Nachmittag", ru: "послеобеденное время" },
+                { de: "der Abend", ru: "вечер" },
+                { de: "die Nacht", ru: "ночь" },
+                { de: "das Essen", ru: "кушать" },
+                { de: "der Fernseher", ru: "телевизор" },
+                { de: "der Kaffee", ru: "кофе" },
+                { de: "das Radio", ru: "радио" },
+                { de: "bald", ru: "скоро" },
+                { de: "besonders", ru: "особенно" },
+                { de: "höflich – unhöflich", ru: "вежливый – невежливый" },
+                { de: "spät", ru: "поздно" },
+                { de: "vielleicht", ru: "может быть" },
+                { de: "keine Lust", ru: "нет желания" },
+                { de: "sowieso", ru: "в любом случае" },
+                { de: "unglaublich", ru: "невозможно" },
+                { de: "joggen", ru: "пробежать трусцой" },
+                { de: "wissen", ru: "знать" },
+                { de: "die Lust", ru: "желание" },
+                { de: "schriftlich", ru: "письменно" },
+                { de: "die Stunde", ru: "час" }
             ]}
         ]}
     ];
 
-    // --- 2. ПЕРЕМЕННЫЕ ВА ФУНКСИЯҲОИ АСОСӢ ---
+    // --- 2. ФУНКСИЯИ АСОСӢ БАРОИ ҶАМЪ КАРДАНИ МЕНЮ ---
     let currentUnitId = null, currentSubId = null, currentQuestions = [], currentIndex = 0, score = 0, currentMode = 'train';
     let artCorrect = 0, artTotal = 0, artAnswered = false;
 
@@ -446,7 +497,6 @@
         list.innerHTML = '';
         
         // 1. ГРУППАИ УМУМӢ
-        const mainUnit = allUnitsData[0];
         let totalWords = 0;
         allUnitsData.forEach(u => u.subs.forEach(s => totalWords += s.words.length));
         
@@ -463,7 +513,7 @@
         `;
         list.appendChild(card1);
 
-        // 2. ИЗБРАННОЕ (ДАР ЯК ЮИТИ АЛОҲИДА)
+        // 2. ИЗБРАННОЕ
         const favList = loadFavorites();
         const favWords = [];
         allUnitsData.forEach(u => u.subs.forEach(s => s.words.forEach(w => { if (favList.includes(w.de)) favWords.push(w); })));
@@ -671,7 +721,7 @@
     function checkConjugationAnswer() {
         const q = currentQuestions[currentIndex];
         const input = document.getElementById('conjInput'); let userAnswer = input.value.trim().toLowerCase();
-        let correctAnswer = q.conjugation.ich.toLowerCase(); // упрощённо для примера
+        let correctAnswer = q.conjugation ? q.conjugation.ich.toLowerCase() : q.de;
         input.disabled = true; document.getElementById('conjCheckBtn').style.display = 'none';
         if (userAnswer === correctAnswer) {
             input.className = 'write-input correct'; document.getElementById('conjFeedback').className = 'write-feedback correct';
@@ -701,7 +751,6 @@
     function startFromSettings() { closeSettings(); }
 
     function moveUnit(id, direction) {
-        // Барои соддагӣ, мо танҳо саҳифаро аз нав мекашем
         renderUnits();
     }
 
