@@ -223,7 +223,7 @@
 </div>
 
 <script>
-    // --- 1. ТАМОМИ МАЪЛУМОТ (10 ЮНИТ БО ҲАМА 83 КАЛИМАИ ЛЕКСИЯ 8 ДАР ЯК ПОДГРУППА) ---
+    // --- БАЗАИ МАЪЛУМОТ (ТАМОМИ ЛЕКСИЯҲО) ---
     const allUnitsData = [
         { id: 'unit1', title: '📖 Юнит 1 (Lektion 1)', subs: [
             { id: 'u1_objects', title: 'Предметы', words: [
@@ -391,9 +391,9 @@
                 { de: "das Internet", ru: "интернет", art: "das" }, { de: "die Natur", ru: "природа", art: "die" }
             ]}
         ]},
-        // --- ЮНИТ 10: ЛЕКСИЯ 8 БО 83 КАЛИМА (ДАР ЯК ПОДГРУППА) ---
+        // --- ЮНИТ 10: ЛЕКСИЯ 8 БО 3 ПОДГРУППА ---
         { id: 'unit10', title: '📖 Юнит 10 (Lektion 8)', subs: [
-            { id: 'u8_full', title: '📖 Лекция 8 (83 слова)', words: [
+            { id: 'u8_city', title: '🏙 В городе (8 слов)', words: [
                 { de: "In der Stadt", ru: "В городе" },
                 { de: "die Ausstellung", ru: "экскурсия, выставка" },
                 { de: "die Bar", ru: "бар" },
@@ -401,7 +401,9 @@
                 { de: "die Kneipe", ru: "кабак, пивная" },
                 { de: "das Café", ru: "кафе" },
                 { de: "das Konzert", ru: "концерт" },
-                { de: "das Museum", ru: "музей" },
+                { de: "das Museum", ru: "музей" }
+            ]},
+            { id: 'u8_place_and_things', title: '🏬 Места и вещи (28 слов)', words: [
                 { de: "das Restaurant", ru: "ресторан" },
                 { de: "das Schwimmbad", ru: "бассейн" },
                 { de: "das Theater", ru: "театр" },
@@ -438,7 +440,9 @@
                 { de: "sich freuen", ru: "радоваться" },
                 { de: "absagen", ru: "отменять" },
                 { de: "die Wendung", ru: "поворот" },
-                { de: "der Spaß", ru: "удовольствие" },
+                { de: "der Spaß", ru: "удовольствие" }
+            ]},
+            { id: 'u8_days_time', title: '📅 Дни и время (47 слов)', words: [
                 { de: "die Langeweile", ru: "скука" },
                 { de: "frische Luft", ru: "свежий воздух" },
                 { de: "einfach", ru: "простой" },
@@ -478,10 +482,22 @@
                 { de: "schriftlich", ru: "письменно" },
                 { de: "die Stunde", ru: "час" }
             ]}
+        ]},
+        // --- ЮНИТ 11: МОДАЛЬНЫЕ ГЛАГОЛЫ ---
+        { id: 'unit11', title: '📖 Юнит 11 (Модальные глаголы)', subs: [
+            { id: 'u11_modals', title: '⚡ Спряжение модальных', words: [
+                { de: "wollen", ru: "хотеть (намереваться)", conjugation: { ich: "will", du: "willst", er: "will", wir: "wollen", ihr: "wollt", sie: "wollen" } },
+                { de: "können", ru: "мочь (уметь)", conjugation: { ich: "kann", du: "kannst", er: "kann", wir: "können", ihr: "könnt", sie: "können" } },
+                { de: "müssen", ru: "быть должным (вынужден)", conjugation: { ich: "muss", du: "musst", er: "muss", wir: "müssen", ihr: "müsst", sie: "müssen" } },
+                { de: "sollen", ru: "быть должным (по заданию)", conjugation: { ich: "soll", du: "sollst", er: "soll", wir: "sollen", ihr: "sollt", sie: "sollen" } },
+                { de: "dürfen", ru: "мочь (разрешение)", conjugation: { ich: "darf", du: "darfst", er: "darf", wir: "dürfen", ihr: "dürft", sie: "dürfen" } },
+                { de: "mögen", ru: "любить (нравиться)", conjugation: { ich: "mag", du: "magst", er: "mag", wir: "mögen", ihr: "mögt", sie: "mögen" } },
+                { de: "möchte", ru: "хотеть (вежливое)", conjugation: { ich: "möchte", du: "möchtest", er: "möchte", wir: "möchten", ihr: "möchtet", sie: "möchten" } }
+            ]}
         ]}
     ];
 
-    // --- 2. ФУНКСИЯИ АСОСӢ БАРОИ ҶАМЪ КАРДАНИ МЕНЮ ---
+    // --- ФУНКСИЯҲОИ АСОСӢ ---
     let currentUnitId = null, currentSubId = null, currentQuestions = [], currentIndex = 0, score = 0, currentMode = 'train';
     let artCorrect = 0, artTotal = 0, artAnswered = false;
 
@@ -491,12 +507,10 @@
     function saveMistakes(misList) { localStorage.setItem('assistentMistakes', JSON.stringify(misList)); }
     function addMistake(wordDe) { let list = loadMistakes(); if (!list.includes(wordDe)) { list.push(wordDe); saveMistakes(list); } }
 
-    // --- 3. МЕНЮИ АСОСӢ ---
+    // --- МЕНЮИ АСОСӢ ---
     function renderUnits() {
         const list = document.getElementById('unitList');
         list.innerHTML = '';
-        
-        // 1. ГРУППАИ УМУМӢ
         let totalWords = 0;
         allUnitsData.forEach(u => u.subs.forEach(s => totalWords += s.words.length));
         
@@ -548,31 +562,40 @@
         list.appendChild(card3);
     }
 
-    // --- 4. ФУНКСИЯИ КУШОДАНИ ГРУППАИ УМУМӢ ---
+    // --- КУШОДАНИ ГРУППАИ УМУМӢ (ИСЛОҲШУДА) ---
     function openMainGroup() {
         document.getElementById('menuScreen').style.display = 'none';
         document.getElementById('subMenuScreen').style.display = 'block';
-        const list = document.getElementById('subList'); list.innerHTML = '';
+        const list = document.getElementById('subList');
+        list.innerHTML = '';
+
         allUnitsData.forEach(unit => {
-            let totalWords = 0; unit.subs.forEach(s => totalWords += s.words.length);
-            const card = document.createElement('div'); card.className = 'sub-card';
-            card.innerHTML = `<div class="sub-title">${unit.title}</div><div class="sub-stats"><span class="stat-pill">❓ ${totalWords}</span><span class="stat-pill">📂 ${unit.subs.length} подгруппы</span></div>`;
+            let totalWords = 0;
+            unit.subs.forEach(s => totalWords += s.words.length);
+            const card = document.createElement('div');
+            card.className = 'sub-card';
+            card.innerHTML = `
+                <div class="sub-title">${unit.title}</div>
+                <div class="sub-stats">
+                    <span class="stat-pill">❓ ${totalWords}</span>
+                    <span class="stat-pill">📂 ${unit.subs.length} подгруппы</span>
+                </div>
+            `;
+            // ИСПРАВЛЕНИЕ: Ба ҷои кушодани меню, подгруппаҳои ҳамин Юнит кушода мешаванд
             card.onclick = () => {
-                currentUnitId = unit.id;
-                currentSubId = unit.subs[0].id;
-                openActionMenu(unit.subs[0].id);
+                openSubMenu(unit.id);
             };
             list.appendChild(card);
         });
     }
 
-    function goToUnits() { document.getElementById('subMenuScreen').style.display = 'none'; document.getElementById('menuScreen').style.display = 'block'; localStorage.removeItem('assistentProgress'); }
+    function goToUnits() { document.getElementById('subMenuScreen').style.display = 'none'; document.getElementById('menuScreen').style.display = 'block'; localStorage.removeItem('assistentProgress'); renderUnits(); }
     function goToSubs() { document.getElementById('quizScreen').style.display = 'none'; document.getElementById('subMenuScreen').style.display = 'block'; localStorage.removeItem('assistentProgress'); }
     function openActionMenu(subId) { currentSubId = subId; document.getElementById('actionMenu').style.display = 'flex'; }
     function closeActionMenu() { document.getElementById('actionMenu').style.display = 'none'; }
     function goHome() { localStorage.removeItem('assistentProgress'); document.getElementById('menuScreen').style.display = 'block'; document.getElementById('quizScreen').style.display = 'none'; document.getElementById('subMenuScreen').style.display = 'none'; document.getElementById('resultScreen').style.display = 'none'; document.getElementById('actionMenu').style.display = 'none'; renderUnits(); }
 
-    // --- 5. ФУНКСИЯҲОИ ОҒОЗИ ТЕСТ ---
+    // --- ОҒОЗИ ТЕСТ ---
     function startFavorites() { closeActionMenu(); startCustom('favorites'); }
     function startMistakes() { closeActionMenu(); startCustom('mistakes'); }
 
@@ -615,7 +638,7 @@
         renderQuestion();
     }
 
-    // --- 6. ОТРИСОВКАИ ВОПРОС ---
+    // --- ОТРИСОВКА ВОПРОСА ---
     function renderQuestion() {
         if (currentIndex >= currentQuestions.length) { showResult(); return; }
         localStorage.setItem('assistentProgress', JSON.stringify({ subId: currentSubId, mode: currentMode, index: currentIndex, score: score }));
@@ -634,6 +657,10 @@
         const favBtn = document.getElementById('favBtn');
         favBtn.innerText = q.fav ? '⭐ В избранном' : '⭐ Избранное';
         favBtn.className = q.fav ? 'btn btn-fav active' : 'btn btn-fav';
+
+        if (currentMode === 'conjugation' && !q.conjugation) {
+            currentMode = 'train'; 
+        }
 
         if (currentMode === 'conjugation') {
             conjugationMode.style.display = 'block';
@@ -680,7 +707,7 @@
         }
     }
 
-    // --- 7. ПРОВЕРКА ҶАВОБҲО ---
+    // --- ПРОВЕРКА ҶАВОБҲО ---
     document.querySelectorAll('.art-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             if (artAnswered) return;
@@ -752,6 +779,28 @@
 
     function moveUnit(id, direction) {
         renderUnits();
+    }
+
+    // БАРОИ ПОДГРУППАҲО
+    function openSubMenu(unitId) {
+        currentUnitId = unitId;
+        document.getElementById('menuScreen').style.display = 'none';
+        document.getElementById('subMenuScreen').style.display = 'block';
+        const unit = allUnitsData.find(u => u.id === unitId);
+        const list = document.getElementById('subList');
+        list.innerHTML = '';
+        unit.subs.forEach(sub => {
+            const card = document.createElement('div');
+            card.className = 'sub-card';
+            card.innerHTML = `
+                <div class="sub-title">${sub.title}</div>
+                <div class="sub-stats">
+                    <span class="stat-pill">❓ ${sub.words.length}</span>
+                </div>
+            `;
+            card.onclick = () => { openActionMenu(sub.id); };
+            list.appendChild(card);
+        });
     }
 
     renderUnits();
